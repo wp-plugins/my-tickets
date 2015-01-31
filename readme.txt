@@ -1,4 +1,4 @@
-=== My Calendar ===
+=== My Tickets ===
 Contributors: joedolson
 Donate link: http://www.joedolson.com/my-tickets/
 Tags: events, ticket sales, tickets, ticketing, registration, reservations, event tickets, sell tickets, event registration, box office
