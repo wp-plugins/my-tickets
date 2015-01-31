@@ -36,6 +36,8 @@ For the seller:
 
 My Tickets is hugely flexible, and a library of add-ons to add new gateways and features is in development!
 
+Check out the <a href="http://docs.joedolson.com/my-tickets/">online documentation</a>.
+
 = Translations =
 
 None yet!
