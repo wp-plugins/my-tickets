@@ -47,6 +47,33 @@ function mt_help() {
 							</ul>
 						</div>
 					</div>
+
+					<div class="postbox">
+						<h3 id="faq" tabindex="-1"><?php _e( 'Shortcodes', 'my-tickets' ); ?></h3>
+
+						<div class="inside">
+
+							<textarea readonly='readonly'>[ticket event="1"]</textarea>
+
+							<p>
+								<?php _e( 'Display the Add to Cart form for a single event', 'my-tickets' ); ?>
+							</p>
+
+							<textarea readonly='readonly'>[tickets events="1,2" template="&lt;h3&gt;{post_title}&lt;/h3&gt;"]</textarea>
+
+							<p>
+								<?php _e( 'Shows a list of events. Provide a template with HTML and tags for what information to display. Add to cart form is added to the end of the template automatically.', 'my-tickets' ); ?>
+							</p>
+
+
+							<textarea readonly='readonly'>[quick-cart]</textarea>
+
+							<p>
+								<?php _e( 'Shows a reduced version of the cart with number of tickets, total value of cart, and a link to the shopping cart.', 'my-tickets' ); ?>
+							</p>
+						</div>
+					</div>
+
 					<div class="postbox">
 						<h3 id="faq" tabindex="-1"><?php _e( 'Frequently Asked Questions', 'my-tickets' ); ?></h3>
 

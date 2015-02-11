@@ -13,6 +13,7 @@ function mt_update_payment_settings( $post ) {
 		$mt_ssl              = ( isset( $post['mt_ssl'] ) ) ? 'true' : 'false'; // Using sandbox?
 		$mt_members_discount = (int) preg_replace( '/\D/', '', $post['mt_members_discount'] ); // discount for members (percentage)
 		$mt_currency         = $post['mt_currency'];
+		$mt_phone            = ( isset( $post['mt_phone'] ) ) ? 'on' : 'off';
 
 		$mt_default_gateway = ( isset( $post['mt_default_gateway'] ) ) ? $post['mt_default_gateway'] : 'offline'; // set default gateway
 		$mt_gateway         = ( isset( $post['mt_gateway'] ) ) ? $post['mt_gateway'] : array( 'offline' ); // set enabled gateways
@@ -30,6 +31,7 @@ function mt_update_payment_settings( $post ) {
 			'mt_use_sandbox'      => $mt_use_sandbox,
 			'mt_members_discount' => $mt_members_discount,
 			'mt_currency'         => $mt_currency,
+			'mt_phone'            => $mt_phone,
 			'mt_gateway'          => $mt_gateway,
 			'mt_default_gateway'  => $mt_default_gateway,
 			'mt_gateways'         => $mt_gateways,
@@ -109,6 +111,11 @@ function mt_payment_settings() {
 										<input type="number" name="mt_members_discount" id="mt_members_discount"
 										       size="3" min='0' max='100'
 										       value="<?php echo esc_attr( $options['mt_members_discount'] ); ?>"/>
+									</li>
+									<li>
+										<label
+											for="mt_phone"><?php _e( 'Require phone number on purchases', 'my-tickets' ); ?></label>
+										<input type="checkbox" name="mt_phone" id="mt_phone" value="on" <?php echo checked( $options['mt_phone'], 'on' ); ?> />
 									</li>
 									<?php
 										echo apply_filters( 'mt_payment_settings_fields', '', $options );

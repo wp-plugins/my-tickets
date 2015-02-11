@@ -1,4 +1,4 @@
-.mt_cart_total, .mt_cart_shipping {
+.mt_cart_total, .mt_cart_shipping, .mt_cart_handling {
     text-align: right;
     padding: .25em 0;
 }
@@ -8,7 +8,7 @@
     font-size: 1.2em;
 }
 
-.mt_cart_shipping {
+.mt_cart_shipping, .mt_cart_handling {
     font-size: 1.1em;
 }
 

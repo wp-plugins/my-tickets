@@ -208,6 +208,8 @@ function mt_send_notifications( $status = 'Completed', $details = array(), $erro
 	$send     = true;
 	$id       = $details['id'];
 	$gateway  = get_post_meta( $id, '_gateway', true );
+	$phone    = get_post_meta( $id, '_mt_phone', true );
+
 	// restructure post meta array to match cart array
 	if ( $status == 'Completed' || ( $status == 'Pending' && $gateway == 'offline' ) ) {
 		mt_create_tickets( $id );
@@ -215,11 +217,14 @@ function mt_send_notifications( $status = 'Completed', $details = array(), $erro
 	$purchased    = get_post_meta( $id, '_purchased' );
 	$ticket_array = mt_setup_tickets( $purchased, $id );
 
-	$total = mt_calculate_cart_cost( $purchased );
+	$handling       = ( isset( $options['mt_handling'] ) ) ? $options['mt_handling'] : 0;
+
+	$total = mt_calculate_cart_cost( $purchased ) + $handling;
 	$hash  = md5( add_query_arg( array( 'post_type' => 'mt-payments', 'p' => $id ), home_url() ) );
 
 	$receipt        = add_query_arg( 'receipt_id', $hash, get_permalink( $options['mt_receipt_page'] ) );
 	$transaction_id = get_post_meta( $id, '_transaction_id', true );
+
 
 	if ( $status == 'Completed' ) {
 		$amount_due = '0.00';
@@ -249,7 +254,9 @@ function mt_send_notifications( $status = 'Completed', $details = array(), $erro
 		'transaction'    => apply_filters( 'mt_format_array', '', 'transaction', $transaction_data ),
 		'transaction_id' => $transaction_id,
 		'amount_due'     => $amount_due,
-		'method'         => ucfirst( $ticketing_method )
+		'handling'       => apply_filters( 'mt_money_format', $handling ),
+		'method'         => ucfirst( $ticketing_method ),
+		'phone'          => $phone
 	);
 	$custom_fields = apply_filters( 'mt_custom_fields', array() );
 	foreach ( $custom_fields as $name => $field ) {

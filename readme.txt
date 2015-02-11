@@ -1,6 +1,6 @@
 === My Tickets ===
 Contributors: joedolson
-Donate link: http://www.joedolson.com/my-tickets/
+Donate link: http://www.joedolson.com/donate/
 Tags: events, ticket sales, tickets, ticketing, registration, reservations, event tickets, sell tickets, event registration, box office
 Requires at least: 4.0
 Tested up to: 4.1
@@ -36,6 +36,8 @@ For the seller:
 
 My Tickets is hugely flexible, and a library of add-ons to add new gateways and features is in development!
 
+Check out the <a href="http://docs.joedolson.com/my-tickets/">online documentation</a>.
+
 = Translations =
 
 None yet!
@@ -57,6 +59,14 @@ None yet!
 4. With My Calendar, add ticket parameters to an event. Without My Calendar, choose what post types will support tickets from My Tickets -> Settings, and add ticket parameters to any post or Page!
 
 == Changelog ==
+
+= 1.0.3 =
+
+* Add documentation of ticket shortcodes on Help screen.
+* Add administrative/handling charge for tickets.
+* Add option to require phone number from purchasers.
+* Bug fix: Payments search didn't work.
+* Two new template tags: {handling} and {phone}
 
 = 1.0.2 =
 

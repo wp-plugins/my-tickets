@@ -123,14 +123,15 @@ function mt_setup_paypal( $gateways ) {
 add_filter( 'mt_gateway', 'mt_gateway_paypal', 10, 3 );
 function mt_gateway_paypal( $form, $gateway, $args ) {
 	if ( $gateway == 'paypal' ) {
-		$payment_id     = $args['payment'];
-		$total          = $args['total'];
 		$options        = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
+		$payment_id     = $args['payment'];
+		$handling       = ( isset( $options['mt_handling'] ) ) ? $options['mt_handling'] : 0;
+		$total          = $args['total'] + $handling;
 		$shipping       = ( $args['method'] == 'postal' ) ? 2 : 1;
 		$shipping_price = ( $args['method'] == 'postal' ) ? money_format( '%i', $options['mt_shipping'] ) : 0;
 		$use_sandbox    = $options['mt_use_sandbox'];
 		$currency       = $options['mt_currency'];
-		$merchant          = $options['mt_gateways']['paypal']['merchant_id'];
+		$merchant       = $options['mt_gateways']['paypal']['merchant_id'];
 		$form           = "
 		<form action='" . ( $use_sandbox != 'true' ? "https://www.paypal.com/cgi-bin/webscr" : "https://www.sandbox.paypal.com/cgi-bin/webscr" ) . "' method='POST'>
 		<input type='hidden' name='cmd' value='_xclick' />

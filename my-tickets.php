@@ -1,13 +1,13 @@
 <?php
 /*
 Plugin Name: My Tickets
-Plugin URI: http://www.joedolson.com/
+Plugin URI: http://www.joedolson.com/my-tickets/
 Description: Sell Tickets and take registrations for your events. Integrates with My Calendar.
 Author: Joseph C Dolson
 Author URI: http://www.joedolson.com
-Version: 1.0.2
+Version: 1.0.3
 */
-/*  Copyright 2014  Joe Dolson (email : joe@joedolson.com)
+/*  Copyright 2014-2015  Joe Dolson (email : joe@joedolson.com)
 
     This program is open source software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ Version: 1.0.2
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 global $mt_version;
-$mt_version = '1.0.2';
+$mt_version = '1.0.3';
 
 load_plugin_textdomain( 'my-tickets', false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );
 
@@ -332,6 +332,7 @@ We\'ll see you soon!<br />
 		'mt_from'             => get_bloginfo( 'admin_email' ),
 		'mt_use_sandbox'      => 'false',
 		'mt_currency'         => 'USD',
+		'mt_phone'            => 'off',
 		'mt_members_discount' => '',
 		'mt_ssl'              => 'false',
 		'mt_gateway'          => array( 'offline' ),
@@ -341,6 +342,7 @@ We\'ll see you soon!<br />
 		'mt_tickets_page'     => '',
 		'mt_ticketing'        => array( 'printable' => 'on' ),
 		'mt_shipping'         => 0,
+		'mt_handling'         => 0,
 		'mt_shipping_time'    => '3-5 days',
 		'mt_gateways'         => $gateways
 	);

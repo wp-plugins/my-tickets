@@ -116,6 +116,7 @@ function mt_required_fields( $cart ) {
 	$options = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
 	$output  = mt_render_field( 'name' );
 	$output .= mt_render_field( 'email' );
+	$output .= ( isset( $options['mt_phone'] ) && $options['mt_phone'] == 'on' ) ? mt_render_field( 'phone' ) : '';
 	$opt_types = $options['mt_ticketing'];
 	if ( isset( $opt_types['postal'] ) ) {
 		$no_postal = mt_cart_no_postal( $cart );
@@ -287,6 +288,11 @@ function mt_render_field( $field, $argument = false ) {
 			$user_email = ( is_user_logged_in() ) ? $current_user->user_email : '';
 			$email      = ( isset( $_POST['mt_email'] ) ) ? $_POST['mt_email'] : $user_email;
 			$output     = '<p><label for="mt_email">' . __( 'E-mail (required)', 'my-tickets' ) . '</label> <input type="email" name="mt_email" id="mt_email" value="' . esc_attr( stripslashes( $email ) ) . '" required aria-required="true"  /></p>';
+			break;
+		case 'phone' :
+			$user_phone = ( is_user_logged_in() ) ? get_user_meta( $current_user->ID, 'mt_phone', true ) : '';
+			$phone      = ( isset( $_POST['mt_phone'] ) ) ? $_POST['mt_phone'] : $user_phone;
+			$output     = '<p><label for="mt_phone">' . __( 'Phone (required)', 'my-tickets' ) . '</label> <input type="text" name="mt_phone" id="mt_phone" value="' . esc_attr( stripslashes( $phone ) ) . '" required aria-required="true"  /></p>';
 			break;
 	}
 
@@ -586,15 +592,17 @@ function mt_generate_gateway( $cart ) {
 	$total          = mt_total_cart( $cart );
 	$ticket_method  = ( isset( $_POST['ticketing_method'] ) ) ? $_POST['ticketing_method'] : 'willcall';
 	$shipping_total = ( $ticket_method == 'postal' ) ? $options['mt_shipping'] : 0;
-	$shipping       = ( $shipping_total ) ? "<div class='mt_cart_shipping'>Shipping: <span class='mt_shipping_number'>" . apply_filters( 'mt_money_format', $shipping_total ) . "</span></div>" : '';
-	$report_total   = "<div class='mt_cart_total'>Total: <span class='mt_total_number'>" . apply_filters( 'mt_money_format', $total + $shipping_total ) . "</span></div>";
+	$handling_total = ( isset( $options['mt_handling'] ) ) ? $options['mt_handling'] : 0;
+	$shipping       = ( $shipping_total ) ? "<div class='mt_cart_shipping'>" . __( 'Shipping:', 'my-tickets' ) . " <span class='mt_shipping_number'>" . apply_filters( 'mt_money_format', $shipping_total ) . "</span></div>" : '';
+	$handling       = ( $handling_total ) ? "<div class='mt_cart_handling'>" . __( 'Handling:', 'my-tickets' ) . " <span class='mt_handling_number'>" . apply_filters( 'mt_money_format', $handling_total ) . "</span></div>" : '';
+	$report_total   = "<div class='mt_cart_total'>Total: <span class='mt_total_number'>" . apply_filters( 'mt_money_format', $total + $shipping_total + $handling_total ) . "</span></div>";
 	$payment        = mt_get_data( 'payment' );
 	$mt_gateway     = isset( $_POST['mt_gateway'] ) ? $_POST['mt_gateway'] : 'offline';
 	$args           = array( 'cart' => $cart, 'total' => $total, 'payment' => $payment, 'method' => $ticket_method );
 	$form           = apply_filters( 'mt_gateway', '', $mt_gateway, $args );
 	$form           = apply_filters( 'mt_form_wrapper', $form );
 
-	return $link . $confirmation . $shipping . $report_total . $form;
+	return $link . $confirmation . $shipping . $handling . $report_total . $form;
 }
 
 add_filter( 'mt_form_wrapper', 'mt_wrap_payment_button' );

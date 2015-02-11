@@ -88,8 +88,17 @@ function mt_create_payment( $post ) {
 	update_post_meta( $purchase_id, '_last_name', $post['mt_lname'] );
 	$email = $post['mt_email'];
 	update_post_meta( $purchase_id, '_email', $email );
+	$phone = ( isset( $post['mt_phone']) ) ? $post['mt_phone'] : '';
+	update_post_meta( $purchase_id, '_phone', $phone );
+	if ( is_user_logged_in() ) {
+		update_user_meta( $purchaser, 'mt_phone', $phone );
+	}
+
 	$purchased = $post['mt_cart_order'];
 	$paid      = mt_calculate_cart_cost( $purchased );
+	if ( isset( $options['mt_handling'] ) ) {
+		$paid = $paid + $options['mt_handling'];
+	}
 	update_post_meta( $purchase_id, '_total_paid', $paid );
 	$payment_status = ( $paid == 0 ) ? 'Completed' : 'Pending';
 	update_post_meta( $purchase_id, '_is_paid', $payment_status );

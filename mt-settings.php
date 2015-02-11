@@ -178,7 +178,9 @@ function mt_settings() {
 										'transaction',
 										'transaction_id',
 										'amount_due',
-										'method'
+										'method',
+										'handling',
+										'phone'
 									);
 									// TODO: Test custom template tag
 									$custom_fields = apply_filters( 'mt_custom_fields', array() );

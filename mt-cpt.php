@@ -114,6 +114,11 @@ function mt_default_fields() {
 				'input'   => 'text',
 				'default' => ''
 			),
+			'phone'             => array(
+				'label' => __( 'Purchaser Phone', 'my-tickets' ),
+				'input' => 'text',
+				'default' => ''
+			),
 			'notes'             => array(
 				'label' => __( 'Payment Notes', 'my-tickets' ),
 				'input' => 'textarea',
@@ -568,12 +573,16 @@ function mt_is_event_column( $column_name, $id ) {
 			$event_data = get_post_meta( $id, '_mc_event_data', true );
 			if ( $event_data ) {
 				$registration = get_post_meta( $id, '_mt_registration_options', true );
-				$available    = $registration['total'];
-				$pricing      = $registration['prices'];
-				$tickets      = mt_tickets_left( $pricing, $available );
-				$remain       = $tickets['remain'];
-				$sold         = $tickets['sold'];
-				$status       = "<span class='mt is-event'>" . sprintf( __( '%1$s (%2$s sold)', 'my-tickets' ), $remain, $sold ) . "</span>";
+				if ( is_array( $registration ) ) {
+					$available    = $registration['total'];
+					$pricing      = $registration['prices'];
+					$tickets      = mt_tickets_left( $pricing, $available );
+					$remain       = $tickets['remain'];
+					$sold         = $tickets['sold'];
+					$status       = "<span class='mt is-event'>" . sprintf( __( '%1$s (%2$s sold)', 'my-tickets' ), $remain, $sold ) . "</span>";
+				} else {
+					$status       = "<span class='mt not-event'>" . __( 'Not ticketed', 'my-tickets' ) . "</span>";
+				}
 			} else {
 				$status = "<span class='mt not-event'>" . __( 'Not ticketed', 'my-tickets' ) . "</span>";
 			}
@@ -636,7 +645,7 @@ function filter_mt_payments( $query ) {
 
 	$qv = &$query->query_vars;
 	if ( $pagenow == 'edit.php' && ! empty( $qv['post_type'] ) && $qv['post_type'] == 'mt-payments' ) {
-		if ( empty( $_GET['mt_filter'] ) ) {
+		if ( empty( $_GET['mt_filter'] ) || $_GET['mt_filter'] == 'all' ) {
 			return;
 		}
 		if ( isset( $_GET['mt_filter'] ) ) {

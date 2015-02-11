@@ -9,6 +9,7 @@ function mt_update_ticketing_settings( $post ) {
 		if ( ! wp_verify_nonce( $nonce, 'my-tickets' ) ) {
 			return '';
 		}
+		$mt_handling         = ( isset( $post['mt_handling'] ) ) ? $post['mt_handling'] : 0;
 		$mt_shipping         = ( isset( $post['mt_shipping'] ) ) ? $post['mt_shipping'] : 0;
 		$mt_ticketing        = ( isset( $post['mt_ticketing'] ) ) ? $post['mt_ticketing'] : array();
 		$mt_total_tickets        = ( isset( $post['mt_tickets_total'] ) ) ? $post['mt_tickets_total'] : 'inherit';
@@ -24,6 +25,7 @@ function mt_update_ticketing_settings( $post ) {
 		$settings = apply_filters( 'mt_settings', array(
 			'defaults'         => $defaults,
 			'mt_shipping'      => $mt_shipping,
+			'mt_handling'      => $mt_handling,
 			'mt_ticketing'     => $mt_ticketing,
 			'mt_shipping_time' => $mt_shipping_time,
 		), $_POST );
@@ -87,6 +89,10 @@ function mt_ticketing_settings() {
 					<label for='mt_shipping_time'>" . __( 'Approximate Shipping Time for Postal Mail (days)', 'my-tickets' ) . "</label> <input name='mt_shipping_time' id='mt_shipping_time' type='number' min='1' size='4' value='$shipping_time' />
 			</p>
 		</fieldset>";
+								$handling = ( isset( $options['mt_handling'] ) ) ? $options['mt_handling'] : '';
+								$form .= "<p class='handling'>
+					<label for='mt_handling'>" . __( 'Ticket Handling/Administrative Fee', 'my-tickets' ) . "</label> <input name='mt_handling' id='mt_handling' type='text' size='4' value='$handling' />
+			</p>";
 								echo $form;
 								?>
 								<fieldset>
