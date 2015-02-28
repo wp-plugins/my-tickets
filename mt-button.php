@@ -161,14 +161,14 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 				}
 			}
 			if ( $available != 'inherit' ) {
-				$remaining_notice = '<p class="tickets-remaining">' . sprintf( __( '%s tickets remaining.', 'my-tickets' ), "<span class='value'>" . $tickets_remaining . "</span>" ) . '</p>';
+				$remaining_notice = '<p class="tickets-remaining">' . sprintf( apply_filters( 'mt_tickets_remaining_text', __( '%s tickets remaining.', 'my-tickets' ) ), "<span class='value'>" . $tickets_remaining . "</span>" ) . '</p>';
 			} else {
 				$remaining_notice = '';
 			}
 
 			if ( $has_tickets == true ) {
 				$closing_time = mt_sales_close( $event_id, $registration['reg_expires'] );
-				$no_post      = ( $no_postal && in_array( 'postal', array_keys( $options['mt_ticketing'] ) ) ) ? "<p class='mt-no-post'>" . __( 'Tickets for this event cannot be sent by mail.', 'my-tickets' ) . "</p>" : '';
+				$no_post      = ( $no_postal && in_array( 'postal', array_keys( $options['mt_ticketing'] ) ) ) ? "<p class='mt-no-post'>" . apply_filters( 'mt_cannot_send_by_email_text', __( 'Tickets for this event cannot be sent by mail.', 'my-tickets' ) ) . "</p>" : '';
 				$legend       = ( $registration['sales_type'] == 'registration' ) ? __( 'Register', 'my-tickets' ) : __( 'Buy Tickets', 'my-tickets' );
 				$disabled     = ( $total_order > $tickets_remaining ) ? " disabled='disabled'" : '';
 				$output       = "
@@ -188,7 +188,7 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 				<p>$form</p>" .
 				                apply_filters( 'mt_add_to_cart_fields', '', $event_id )
 				                . "<p>
-					<button type='submit' name='mt_add_to_cart'" . $disabled . ">" . __( 'Add to Cart', 'my-tickets' ) . "<span class='mt-processing'><img src='" . admin_url( 'images/spinner-2x.gif' ) . "' alt='" . __( 'Working', 'my-tickets' ) . "' /></span></button>
+					<button type='submit' name='mt_add_to_cart'" . $disabled . ">" . apply_filters( 'mt_add_to_cart_text', __( 'Add to Cart', 'my-tickets' ) ) . "<span class='mt-processing'><img src='" . admin_url( 'images/spinner-2x.gif' ) . "' alt='" . __( 'Working', 'my-tickets' ) . "' /></span></button>
 					<input type='hidden' name='my-tickets' value='true' />
 				</p>
 				</fieldset>
