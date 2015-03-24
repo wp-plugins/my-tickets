@@ -281,7 +281,6 @@ function mt_wp_enqueue_scripts() {
 }
 
 add_action( 'wp_ajax_mt_post_lookup', 'mt_post_lookup' );
-add_action( 'wp_ajax_nopriv_mt_post_lookup', 'mt_post_lookup' );
 
 function mt_post_lookup() {
 	if ( isset( $_REQUEST['term'] ) ) {

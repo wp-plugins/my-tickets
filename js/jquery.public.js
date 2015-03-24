@@ -49,6 +49,10 @@
             if (action == 'more') {
                 var newval = parseInt(val) + 1;
             } else if (action == 'less') {
+                if ( parseInt(val) == 0 ) {
+                    var newval = 0;
+                    $(target).addClass('removed');
+                }
                 var newval = parseInt(val) - 1;
             } else {
                 var newval = 0;
@@ -58,12 +62,20 @@
             $(target + ' .mt_count').val(newval);
             $(target + ' span.count').text(newval);
             var total = 0;
-            $('td .count').each(function () {
-                var count = $(this).text();
-                var price = $(this).parent('td').siblings().children('.price').text();
-                total += count * price;
+            $('td .count').each( function () {
+                if ( $(this).is( ':visible' ) ) {
+                    var count = $(this).text();
+                    var price = $(this).parent('td').siblings().children('.price').text();
+                    total += parseInt(count) * parseFloat(price);
+                }
             });
-            $('.mt_total_number').text('$' + parseFloat(total).toFixed(2).replace('/(\d)(?=(\d{3})+\.)/g', "$1,").toString());
+            var mtTotal = parseFloat(total).toFixed(2).replace('/(\d)(?=(\d{3})+\.)/g', "$1,");
+            if ( mtTotal < 0 ) {
+                $( 'input[name="mt_submit"]').prop( 'disabled', true );
+            } else {
+                $( 'input[name="mt_submit"]').prop( 'disabled', false );
+            }
+            $('.mt_total_number').text( mt_ajax.currency + mtTotal.toString());
 
             var data = {
                 'action': mt_ajax_cart.action,

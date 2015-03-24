@@ -208,7 +208,7 @@ function mt_send_notifications( $status = 'Completed', $details = array(), $erro
 	$send     = true;
 	$id       = $details['id'];
 	$gateway  = get_post_meta( $id, '_gateway', true );
-	$phone    = get_post_meta( $id, '_mt_phone', true );
+	$phone    = get_post_meta( $id, '_phone', true );
 
 	// restructure post meta array to match cart array
 	if ( $status == 'Completed' || ( $status == 'Pending' && $gateway == 'offline' ) ) {

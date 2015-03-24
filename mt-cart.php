@@ -315,9 +315,11 @@ function mt_gateways() {
 		$labels = mt_setup_gateways();
 		foreach ( $enabled as $gate ) {
 			$current_gate = ( isset( $_GET['mt_gateway'] ) && in_array( $_GET['mt_gateway'], $enabled ) ) ? $_GET['mt_gateway'] : $options['mt_default_gateway'];
-			$checked      = ( $gate == $current_gate ) ? ' class="active"' : '';
-			$label        = $labels[ $gate ]['label'];
-			$selector .= "<li$checked><a href='$url?mt_gateway=$gate' data-assign='$gate'>$label</a></li>";
+			if ( isset( $labels[ $gate ] ) ) {
+				$checked      = ( $gate == $current_gate ) ? ' class="active"' : '';
+				$label        = $labels[ $gate ]['label'];
+				$selector .= "<li$checked><a href='$url?mt_gateway=$gate' data-assign='$gate'>$label</a></li>";
+			}
 		}
 
 		return "<div class='gateway-selector'><ul><li>" . __( 'Payment Gateway', 'my-tickets' ) . ": $selector</ul></div>";
@@ -471,46 +473,51 @@ function mt_generate_cart_table( $cart, $format = 'cart' ) {
 			</thead>
 			<tbody>';
 	$total = 0;
-	foreach ( $cart as $event_id => $order ) {
-		$expired = mt_expired( $event_id );
-		if ( ! $expired ) {
-			$prices       = mt_get_prices( $event_id );
-			$currency     = $options['mt_currency'];
-			$event        = get_post( $event_id );
-			$title        = apply_filters( 'mt_link_title', $event->post_title, $event );
-			$image        = ( has_post_thumbnail( $event_id ) ) ? get_the_post_thumbnail( $event_id, array( 80, 80 ) ) : '';
-			$data         = get_post_meta( $event_id, '_mc_event_data', true );
-			$registration = get_post_meta( $event_id, '_mt_registration_options', true );
-			$date         = $data['event_begin'] . ' ' . $data['event_time'];
-			$datetime     = "<span class='mt-datetime'>" . date_i18n( get_option( 'date_format' ) . ' @ ' . get_option( 'time_format' ), strtotime( $date ) ) . "</span>";
-			if ( is_array( $order ) ) {
-				foreach ( $order as $type => $count ) {
-					if ( $count > 0 ) {
-						if ( isset( $prices[$type] ) ) {
-							$price = $prices[ $type ]['price'];
-							$label = $prices[ $type ]['label'];
-							if ( $format == 'cart' || is_admin() ) {
-								$hidden = "
-										<input type='hidden' class='mt_count' name='mt_cart_order[$event_id][$type][count]' value='$count' />
-										<input type='hidden' name='mt_cart_order[$event_id][$type][price]' value='$price' />";
-							} else {
-								$hidden = '';
-							}
-							$total  = $total + ( $price * $count );
-							$custom = apply_filters( 'mt_show_in_cart_fields', '', $event_id );
-							$output .= "
-										<tr id='mt_cart_order_$event_id" . '_' . "$type'>
-											<th scope='row'>$image$title: <em>$label</em><br />$datetime$hidden$custom</th>
-											<td>$currency " . apply_filters( 'mt_money_format', $price ) . "</td>
-											<td aria-live='assertive'><span class='count'>$count</span></td>";
-							if ( $format == 'cart' && apply_filters( 'mt_include_update_column', true ) ) {
-								if ( $registration['multiple'] == 'true' ) {
-									$output .= "<td class='mt-update-column'><button data-id='$event_id' data-type='$type' rel='#mt_cart_order_$event_id" . '_' . "$type' class='more'>+<span class='screen-reader-text'> " . __( 'More', 'my-tickets' ) . "</span></button> <button data-id='$event_id' data-type='$type' rel='#mt_cart_order_$event_id" . '_' . "$type' class='less'>-<span class='screen-reader-text'> " . __( 'Less', 'my-tickets' ) . "</span></button> <button data-id='$event_id' data-type='$type' rel='#mt_cart_order_$event_id" . '_' . "$type' class='remove'>x<span class='screen-reader-text'> " . __( 'Remove from cart', 'my-tickets' ) . "</span></button></td>";
+	if ( is_array( $cart ) && ! empty( $cart ) ) {
+		foreach ( $cart as $event_id => $order ) {
+			$expired = mt_expired( $event_id );
+			if ( ! $expired ) {
+				$prices       = mt_get_prices( $event_id );
+				$currency     = $options['mt_currency'];
+				$event        = get_post( $event_id );
+				$title        = apply_filters( 'mt_link_title', $event->post_title, $event );
+				$image        = ( has_post_thumbnail( $event_id ) ) ? get_the_post_thumbnail( $event_id, array(
+					80,
+					80
+				) ) : '';
+				$data         = get_post_meta( $event_id, '_mc_event_data', true );
+				$registration = get_post_meta( $event_id, '_mt_registration_options', true );
+				$date         = $data['event_begin'] . ' ' . $data['event_time'];
+				$datetime     = "<span class='mt-datetime'>" . date_i18n( get_option( 'date_format' ) . ' @ ' . get_option( 'time_format' ), strtotime( $date ) ) . "</span>";
+				if ( is_array( $order ) ) {
+					foreach ( $order as $type => $count ) {
+						if ( $count > 0 ) {
+							if ( isset( $prices[ $type ] ) ) {
+								$price = $prices[ $type ]['price'];
+								$label = $prices[ $type ]['label'];
+								if ( $format == 'cart' || is_admin() ) {
+									$hidden = "
+											<input type='hidden' class='mt_count' name='mt_cart_order[$event_id][$type][count]' value='$count' />
+											<input type='hidden' name='mt_cart_order[$event_id][$type][price]' value='$price' />";
 								} else {
-									$output .= "<td class='mt-update-column'><button data-id='$event_id' data-type='$type' rel='#mt_cart_order_$event_id" . '_' . "$type' class='remove'>x<span class='screen-reader-text'> " . __( 'Remove from cart', 'my-tickets' ) . "</span></button>" . apply_filters( 'mt_no_multiple_registration', '' ) . "</td>";
+									$hidden = '';
 								}
+								$total  = $total + ( $price * $count );
+								$custom = apply_filters( 'mt_show_in_cart_fields', '', $event_id );
+								$output .= "
+											<tr id='mt_cart_order_$event_id" . '_' . "$type'>
+												<th scope='row'>$image$title: <em>$label</em><br />$datetime$hidden$custom</th>
+												<td>$currency " . apply_filters( 'mt_money_format', $price ) . "</td>
+												<td aria-live='assertive'><span class='count'>$count</span></td>";
+								if ( $format == 'cart' && apply_filters( 'mt_include_update_column', true ) ) {
+									if ( $registration['multiple'] == 'true' ) {
+										$output .= "<td class='mt-update-column'><button data-id='$event_id' data-type='$type' rel='#mt_cart_order_$event_id" . '_' . "$type' class='more'>+<span class='screen-reader-text'> " . __( 'More', 'my-tickets' ) . "</span></button> <button data-id='$event_id' data-type='$type' rel='#mt_cart_order_$event_id" . '_' . "$type' class='less'>-<span class='screen-reader-text'> " . __( 'Less', 'my-tickets' ) . "</span></button> <button data-id='$event_id' data-type='$type' rel='#mt_cart_order_$event_id" . '_' . "$type' class='remove'>x<span class='screen-reader-text'> " . __( 'Remove from cart', 'my-tickets' ) . "</span></button></td>";
+									} else {
+										$output .= "<td class='mt-update-column'><button data-id='$event_id' data-type='$type' rel='#mt_cart_order_$event_id" . '_' . "$type' class='remove'>x<span class='screen-reader-text'> " . __( 'Remove from cart', 'my-tickets' ) . "</span></button>" . apply_filters( 'mt_no_multiple_registration', '' ) . "</td>";
+									}
+								}
+								$output .= "</tr>";
 							}
-							$output .= "</tr>";
 						}
 					}
 				}
@@ -540,8 +547,10 @@ function mt_total_cart( $cart ) {
 				$prices = mt_get_prices( $event );
 				if ( is_array( $order ) ) {
 					foreach ( $order as $type => $count ) {
-						$price = ( isset( $prices[ $type ] ) ) ? $prices[ $type ]['price'] : '';
-						$total = $total + ( $price * $count );
+						if ( $count > 0 ) {
+							$price = ( isset( $prices[ $type ] ) ) ? $prices[ $type ]['price'] : '';
+							$total = $total + ( $price * $count );
+						}
 					}
 				}
 			}

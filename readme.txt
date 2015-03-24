@@ -60,6 +60,26 @@ None yet!
 
 == Changelog ==
 
+= Future =
+
+* Bug: can add a ticket record to a purchase that reflects 0 tickets purchased. If no tickets purchased, should not create that record. (SEE MPO)
+* Improve options when there are multiple dates available for a specific event. Multiple ticket patterns w/separate pricing & availability options, etc.? Note accessibility features?
+* Add 'Reservation' as admin-only payment status
+* Per-ticket handling fee
+* Print This Report button
+* Shut off ticket sales when 'x' tickets are left.
+* Add note that 'x' tickets are still available for sale after sales are closed.
+* Multiplication problem with totals? see https://wordpress.org/support/topic/multiplication-in-cart-is-wrong?replies=4
+
+= 1.0.4 =
+
+* Bug fix: Invalid argument error on user profiles
+* Bug fix: Don't attempt to use default payment gateway if that gateway has been deactivated.
+* Bug fix: When total updated, currency was changed to $.
+* Bug fix: Plus/minus buttons in cart could take number of tickets below 0
+* Bug fix: Cart total calculation included deleted cart items
+* Bug fix: Cart total value could go negative without disabling cart submission.
+
 = 1.0.3 =
 
 * Add documentation of ticket shortcodes on Help screen.

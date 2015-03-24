@@ -183,6 +183,10 @@ function mt_public_enqueue_scripts() {
 	} else {
 		$ticket_styles = plugins_url( '/css/mt-cart.css', __FILE__ );
 	}
+
+	$options = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
+	$symbol  = mt_symbols( $options['mt_currency'] );
+
 	wp_enqueue_script( 'mt.payment', plugins_url( 'js/jquery.payment.js', __FILE__ ), array( 'jquery' ) );
 	wp_enqueue_script( 'mt.public', plugins_url( 'js/jquery.public.js', __FILE__ ), array( 'jquery' ) );
 	wp_enqueue_style( 'mt-styles', $ticket_styles );
@@ -190,7 +194,8 @@ function mt_public_enqueue_scripts() {
 		array(
 			'action'   => 'mt_ajax_handler',
 			'url'      => admin_url( 'admin-ajax.php' ),
-			'security' => wp_create_nonce( 'mt-cart-nonce' )
+			'security' => wp_create_nonce( 'mt-cart-nonce' ),
+			'currency' => $symbol
 		)
 	);
 	wp_localize_script( 'mt.public', 'mt_ajax_cart',
