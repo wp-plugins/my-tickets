@@ -189,13 +189,12 @@ function mt_calculate_cart_cost( $purchased ) {
 		$prices = mt_get_prices( $event_id );
 		if ( $prices ) {
 			foreach ( $tickets as $type => $ticket ) {
-				if ( $ticket['count'] > 0 ) {
+				if ( (int) $ticket['count'] > 0 ) {
 					$price = $prices[ $type ]['price'] * $ticket['count'];
 					$total = $total + $price;
 				}
 			}
 		}
 	}
-
 	return round( $total, 2 );
 }

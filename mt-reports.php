@@ -335,42 +335,54 @@ function mt_purchases( $event_id, $options = array( 'include_failed' => false ) 
 				continue;
 			}
 			foreach ( $details as $type => $tickets ) {
-				$purchaser     = get_the_title( $purchase_id );
-				$first_name    = get_post_meta( $purchase_id, '_first_name', true );
-				$last_name     = get_post_meta( $purchase_id, '_last_name', true );
-				if ( !$first_name || !$last_name ) {
-					$name = explode( ' ', $purchaser );
-					$first_name = $name[0];
-					$last_name = end( $name );
-				}
-				$date          = get_the_time( 'Y-m-d', $purchase_id );
-				$time          = get_the_time( get_option( 'time_format' ), $purchase_id );
-				$datetime      = "$date<br />$time";
 				$count         = $details[ $type ]['count'];
-				$price         = $details[ $type ]['price'];
-				$subtotal      = $count * $price;
-				$paid          = ( $status == 'Completed' ) ? $subtotal : 0;
-				$total_income  = $total_income + $paid;
-				$total_tickets = $total_tickets + $count;
-				$class         = esc_attr( strtolower( $status ) );
-				$custom_fields = apply_filters( 'mt_custom_fields', array() );
-				$custom_cells  = $custom_csv = '';
-				foreach ( $custom_fields as $name => $field ) {
-					$value = get_post_meta( $purchase_id, $name, true );
-					if ( is_array( $value ) ) {
-						$value = implode( ';', $value );
+				if ( $count > 0 ) {
+					$purchaser  = get_the_title( $purchase_id );
+					$first_name = get_post_meta( $purchase_id, '_first_name', true );
+					$last_name  = get_post_meta( $purchase_id, '_last_name', true );
+					if ( ! $first_name || ! $last_name ) {
+						$name       = explode( ' ', $purchaser );
+						$first_name = $name[0];
+						$last_name  = end( $name );
 					}
-					$value = apply_filters( 'mt_format_report_field', $value, get_post_meta( $purchase_id, $name, true ), $purchase_id, $name );
+					$date          = get_the_time( 'Y-m-d', $purchase_id );
+					$time          = get_the_time( get_option( 'time_format' ), $purchase_id );
+					$transaction   = get_post_meta( $purchase_id, '_transaction_data', true );
+					$address       = ( isset( $transaction['shipping'] ) ) ? $transaction['shipping'] : false;
+					$phone         = get_post_meta( $purchase_id, '_phone', true );
 
-					$custom_cells .= "<td class='mt_" . sanitize_title( $name ) . "'>$value</td>\n";
-					$custom_csv .= ",\"$value\"";
+					$street        = ( isset( $address['street'] ) ) ? $address['street'] : '';
+					$street2       = ( isset( $address['street2'] ) ) ? $address['street2'] : '';
+					$city          = ( isset( $address['city'] ) ) ? $address['city'] : '';
+					$state         = ( isset( $address['state'] ) ) ? $address['state'] : '';
+					$code          = ( isset( $address['code'] ) ) ? $address['code'] : '';
+					$country       = ( isset( $address['country'] ) ) ? $address['country'] : '';
+					$datetime      = "$date<br />$time";
+					$price         = $details[ $type ]['price'];
+					$subtotal      = $count * $price;
+					$paid          = ( $status == 'Completed' ) ? $subtotal : 0;
+					$total_income  = $total_income + $paid;
+					$total_tickets = $total_tickets + $count;
+					$class         = esc_attr( strtolower( $status ) );
+					$custom_fields = apply_filters( 'mt_custom_fields', array() );
+					$custom_cells  = $custom_csv = '';
+					foreach ( $custom_fields as $name => $field ) {
+						$value = get_post_meta( $purchase_id, $name, true );
+						if ( is_array( $value ) ) {
+							$value = implode( ';', $value );
+						}
+						$value = apply_filters( 'mt_format_report_field', $value, get_post_meta( $purchase_id, $name, true ), $purchase_id, $name );
+
+						$custom_cells .= "<td class='mt_" . sanitize_title( $name ) . "'>$value</td>\n";
+						$custom_csv .= ",\"$value\"";
+					}
+					$alternate = ( $alternate == 'alternate' ) ? 'even' : 'alternate';
+					$row       = "<tr class='$alternate'><th scope='row'>$purchaser</th><td>$type</td><td>$count</td><td>" . apply_filters( 'mt_money_format', $price ) . "</td><td>" . apply_filters( 'mt_money_format', $paid ) . "</td><td class='mt_status'><span class='mt $class'>$status</span></td><td>$datetime</td>$custom_cells</tr>";
+					// add split field to csv headers
+					$csv                         = "\"$last_name\",\"$first_name\",\"$type\",\"$count\",\"$price\",\"$paid\",\"$status\",\"$date\",\"$time\",\"$phone\",\"$street\",\"$street2\",\"$city\",\"$state\",\"$code\",\"$country\"$custom_csv" . PHP_EOL;
+					$report['html'][ $status ][] = $row;
+					$report['csv'][ $status ][]  = $csv;
 				}
-				$alternate                   = ( $alternate == 'alternate' ) ? 'even' : 'alternate';
-				$row                         = "<tr class='$alternate'><th scope='row'>$purchaser</th><td>$type</td><td>$count</td><td>" . apply_filters( 'mt_money_format', $price ) . "</td><td>" . apply_filters( 'mt_money_format', $paid ) . "</td><td class='mt_status'><span class='mt $class'>$status</span></td><td>$datetime</td>$custom_cells</tr>";
-				// add split field to csv headers
-				$csv                         = "\"$last_name\",\"$first_name\",\"$type\",\"$count\",\"$price\",\"$paid\",\"$status\",\"$date\",\"$time\",$custom_csv" . PHP_EOL;
-				$report['html'][ $status ][] = $row;
-				$report['csv'][ $status ][]  = $csv;
 			}
 		}
 	}
@@ -433,7 +445,23 @@ function mt_download_csv_event() {
 		foreach ( $custom_fields as $name => $field ) {
 			$custom_headings .= ",\"$name\"";
 		}
-		$csv = __( 'First Name', 'my-tickets' ) . "," . __( 'Last Name', 'my-tickets' ) . "," . __( 'Ticket Type', 'my-tickets' ) . "," . __( 'Purchased', 'my-tickets' ) . "," . __( 'Price', 'my-tickets' ) . "," . __( 'Paid', 'my-tickets' ) . "," . __( 'Payment Status', 'my-tickets' ) . "," . __( 'Date', 'my-tickets' ) . "," . __( 'Time', 'my-tickets' ) . $custom_headings . PHP_EOL;
+		$csv = __( 'First Name', 'my-tickets' ) . ","
+		       . __( 'Last Name', 'my-tickets' ) . ","
+		       . __( 'Ticket Type', 'my-tickets' ) . ","
+		       . __( 'Purchased', 'my-tickets' ) . ","
+		       . __( 'Price', 'my-tickets' ) . ","
+		       . __( 'Paid', 'my-tickets' ) . ","
+		       . __( 'Payment Status', 'my-tickets' ) . ","
+		       . __( 'Date', 'my-tickets' ) . ","
+		       . __( 'Time', 'my-tickets' ) . ","
+		       . __( 'Phone', 'my-tickets' ) . ","
+		       . __( 'Street', 'my-tickets' ) . ","
+		       . __( 'Street (2)', 'my-tickets' ) . ","
+		       . __( 'City', 'my-tickets' ) . ","
+		       . __( 'State', 'my-tickets' ) . ","
+		       . __( 'Postal Code', 'my-tickets' ) . ","
+		       . __( 'Country', 'my-tickets' )
+		       . $custom_headings . PHP_EOL;
 		foreach ( $report as $status => $rows ) {
 			foreach ( $rows as $type => $row ) {
 				$csv .= $row;

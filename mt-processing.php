@@ -134,12 +134,12 @@ function mt_calculate_discount( $price ) {
 	return $discounted;
 }
 
-/* 
+/*
  * Add registration fields for My Calendar events
  *
- * @param $has_data bool 
+ * @param $has_data bool
  * @param $data object
- * 
+ *
  */
 function mt_registration_fields( $form, $has_data, $data, $public = 'admin' ) {
 	$original_form = $form;
@@ -216,7 +216,7 @@ function mt_registration_fields( $form, $has_data, $data, $public = 'admin' ) {
 	return apply_filters( 'mc_event_registration_form', $form, $has_data, $data, $public, $original_form );
 }
 
-/* 
+/*
  * Generates pricing table from registration array and event ID; uses defaults if no values passed.
  *
  * @param $registration array : array of ticketing and registration data for this event.
@@ -289,9 +289,9 @@ function mt_prices_table( $registration = array() ) {
 	return $total . $return;
 }
 
-/* 
+/*
  * Save registration/ticketing info as post meta.
- * 
+ *
  * @param $post_id int
  * @param $post array $_POST
  * @param $data My Calendar event object
@@ -330,9 +330,9 @@ function mt_save_registration_data( $post_id, $post, $data = array(), $event_id 
 	update_post_meta( $post_id, '_mt_hide_registration_form', $hide );
 }
 
-/* 
+/*
  * Generates pricing array from POST data
- * 
+ *
  * @param $labels array
  * @param $prices array
  * @param $availability array
@@ -353,11 +353,12 @@ function mt_setup_pricing( $labels, $prices, $availability, $sold = array() ) {
 				} else {
 					$tickets = '';
 				}
-				$sold                      = ( isset( $sold[ $i ] ) ) ? (int) $sold[ $i ] : '';
+				$sold_tickets              = ( isset( $sold[ $i ] ) ) ? (int) $sold[ $i ] : '';
+
 				$return[ $internal_label ] = array( 'label'   => $label,
 				                                    'price'   => $price,
 				                                    'tickets' => $tickets,
-				                                    'sold'    => $sold
+				                                    'sold'    => $sold_tickets
 				);
 				$i ++;
 			}

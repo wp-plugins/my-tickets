@@ -3,7 +3,7 @@ Contributors: joedolson
 Donate link: http://www.joedolson.com/donate/
 Tags: events, ticket sales, tickets, ticketing, registration, reservations, event tickets, sell tickets, event registration, box office
 Requires at least: 4.0
-Tested up to: 4.1
+Tested up to: 4.1.1
 License: GPLv2 or later
 Stable tag: 1.0.3
 
@@ -62,14 +62,11 @@ None yet!
 
 = Future =
 
-* Bug: can add a ticket record to a purchase that reflects 0 tickets purchased. If no tickets purchased, should not create that record. (SEE MPO)
 * Improve options when there are multiple dates available for a specific event. Multiple ticket patterns w/separate pricing & availability options, etc.? Note accessibility features?
 * Add 'Reservation' as admin-only payment status
 * Per-ticket handling fee
 * Print This Report button
 * Shut off ticket sales when 'x' tickets are left.
-* Add note that 'x' tickets are still available for sale after sales are closed.
-* Multiplication problem with totals? see https://wordpress.org/support/topic/multiplication-in-cart-is-wrong?replies=4
 
 = 1.0.4 =
 
@@ -79,6 +76,14 @@ None yet!
 * Bug fix: Plus/minus buttons in cart could take number of tickets below 0
 * Bug fix: Cart total calculation included deleted cart items
 * Bug fix: Cart total value could go negative without disabling cart submission.
+* Bug fix: Add a couple missing textdomains.
+* Bug fix: Handling fee not shown to offline payments.
+* Bug fix: Amount due pulled from wrong data on offline payments.
+* Bug fix: Updating posts with tickets could modify the count of sold tickets.
+* Bug fix: If cart submitted with 0 tickets on a ticket type, do not display those values in reports/admin.
+* Include address fields in purchase reports
+* Include phone number in purchase reports.
+* Add note that 'x' tickets are still available for sale after sales are closed.
 
 = 1.0.3 =
 
@@ -118,4 +123,4 @@ This is a brand new plug-in; but I'm sure you'll have questions in time! Meanwhi
 
 = 1.0.0 =
 
-None yet!
+1.0.4: Several important bug fixes, improvements to purchase reporting.

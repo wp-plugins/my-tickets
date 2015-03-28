@@ -41,6 +41,7 @@ function mt_paypal_ipn() {
 			$response_code = $ipn['response']['code'];
 
 			// map paypal IPN format of address to MT format
+			// All gateways must map shipping addresses to this format.
 			$address = array(
 				'street'  => isset( $_POST['address_street'] ) ? $_POST['address_street'] : '',
 				'street2' => isset( $_POST['address2'] ) ? $_POST['address2'] : '',

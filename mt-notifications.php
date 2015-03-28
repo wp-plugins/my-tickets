@@ -105,25 +105,27 @@ function mt_format_purchase( $purchase, $format = false ) {
 				$time  = date_i18n( get_option( 'time_format' ), strtotime( $event['event_time'] ) );
 				$output .= $title . $sep . $date . ' @ ' . $time . $sep . $sep;
 				foreach ( $tickets as $type => $ticket ) {
-					$total = $total + $ticket['price'] * $ticket['count'];
-					$type  = ucfirst( str_replace( '-', ' ', $type ) );
-					if ( $is_html ) {
-						$output .= sprintf(
-							           _n( '%1$s: 1 ticket at %2$s', '%1$s: %3$d tickets at %2$s', $ticket['count'], 'my-tickets' ),
-							           "<strong>" . $type . "</strong>",
-							           strip_tags( apply_filters( 'mt_money_format', $ticket['price'] ) ),
-							           $ticket['count']
-						           ) . $sep;
-					} else {
-						$output .= sprintf(
-							           _n( '%1$s: 1 ticket at %2$s', '%1$s: %3$d tickets at %2$s', $ticket['count'], 'my-tickets' ),
-							           $type,
-							           strip_tags( apply_filters( 'mt_money_format', $ticket['price'] ) ),
-							           $ticket['count']
-						           ) . $sep;
+					if ( $ticket['count'] > 0 ) {
+						$total = $total + $ticket['price'] * $ticket['count'];
+						$type  = ucfirst( str_replace( '-', ' ', $type ) );
+						if ( $is_html ) {
+							$output .= sprintf(
+								           _n( '%1$s: 1 ticket at %2$s', '%1$s: %3$d tickets at %2$s', $ticket['count'], 'my-tickets' ),
+								           "<strong>" . $type . "</strong>",
+								           strip_tags( apply_filters( 'mt_money_format', $ticket['price'] ) ),
+								           $ticket['count']
+							           ) . $sep;
+						} else {
+							$output .= sprintf(
+								           _n( '%1$s: 1 ticket at %2$s', '%1$s: %3$d tickets at %2$s', $ticket['count'], 'my-tickets' ),
+								           $type,
+								           strip_tags( apply_filters( 'mt_money_format', $ticket['price'] ) ),
+								           $ticket['count']
+							           ) . $sep;
+						}
 					}
 				}
-				$output .= $sep . __( 'Total', 'my-tickets' ) . ': ' . strip_tags( apply_filters( 'mt_money_format', $total ) ) . $sep;
+				$output .= $sep . __( 'Ticket Total', 'my-tickets' ) . ': ' . strip_tags( apply_filters( 'mt_money_format', $total ) ) . $sep;
 			}
 		}
 	}
@@ -215,11 +217,13 @@ function mt_send_notifications( $status = 'Completed', $details = array(), $erro
 		mt_create_tickets( $id );
 	}
 	$purchased    = get_post_meta( $id, '_purchased' );
+	$purchase_data = get_post_meta( $id, '_purchase_data', true );
+
 	$ticket_array = mt_setup_tickets( $purchased, $id );
 
 	$handling       = ( isset( $options['mt_handling'] ) ) ? $options['mt_handling'] : 0;
 
-	$total = mt_calculate_cart_cost( $purchased ) + $handling;
+	$total = mt_calculate_cart_cost( $purchase_data ) + $handling;
 	$hash  = md5( add_query_arg( array( 'post_type' => 'mt-payments', 'p' => $id ), home_url() ) );
 
 	$receipt        = add_query_arg( 'receipt_id', $hash, get_permalink( $options['mt_receipt_page'] ) );

@@ -196,8 +196,19 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 			}
 		}
 	} else {
-		$sales_closed = ( $registration['sales_type'] == 'registration' ) ? __( 'Registration for this event is closed', 'my-tickets' ) : __( 'Ticket sales for this event are closed.', 'my-tickets' );
-		$output      = "<p>" . apply_filters( 'mt_sales_closed', $sales_closed ) . "</p>";
+		$event_id     = ( is_object( $event ) ) ? $event->event_post : $event;
+		$registration = get_post_meta( $event_id, '_mt_registration_options', true );
+		$available = $registration['total'];
+		$pricing = $registration['prices'];
+		$tickets_remaining = mt_tickets_left( $pricing, $available );
+		$tickets_remaining = $tickets_remaining['remain'];
+		if ( $tickets_remaining > 0 ) {
+			$tickets_remain_text = ' ' . sprintf( apply_filters( 'mt_tickets_still_remaining_text', __( 'There are still %d tickets available at the box office!', 'my-tickets' ) ), $tickets_remaining );
+		} else {
+			$tickets_remain_text = '';
+		}
+		$sales_closed = ( $registration['sales_type'] == 'registration' ) ? __( 'Online registration for this event is closed', 'my-tickets' ) : __( 'Online ticket sales for this event are closed.', 'my-tickets' );
+		$output      = "<p>" . apply_filters( 'mt_sales_closed', $sales_closed ) . "$tickets_remain_text</p>";
 	}
 
 	if ( $sold_out == true && $tickets_sold > 0 ) {

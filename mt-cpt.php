@@ -210,25 +210,28 @@ function mt_setup_tickets( $purchase, $id ) {
 			foreach ( $tickets as $type => $details ) {
 				// add ticket hash for each ticket
 				$count = $details['count'];
-				$price = $details['price'];
-				for ( $i = 0; $i < $count; $i ++ ) {
-					$ticket_id = mt_generate_ticket_id( $id, $type, $i, $price );
-					// check for existing ticket data
-					$meta = get_post_meta( $id, $ticket_id, true );
-					$ticket_meta = get_post_meta( $event, '_ticket' );
-					// if ticket data doesn't exist, create it.
-					if ( !$meta ) {
-						if ( ! in_array( $ticket_id, $ticket_meta ) ) {
-							add_post_meta( $event, '_ticket', $ticket_id );
+				// only add tickets if count of tickets is more than 0
+				if ( $count >= 1 ) {
+					$price = $details['price'];
+					for ( $i = 0; $i < $count; $i ++ ) {
+						$ticket_id = mt_generate_ticket_id( $id, $type, $i, $price );
+						// check for existing ticket data
+						$meta        = get_post_meta( $id, $ticket_id, true );
+						$ticket_meta = get_post_meta( $event, '_ticket' );
+						// if ticket data doesn't exist, create it.
+						if ( ! $meta ) {
+							if ( ! in_array( $ticket_id, $ticket_meta ) ) {
+								add_post_meta( $event, '_ticket', $ticket_id );
+							}
+							update_post_meta( $id, $ticket_id, array(
+								'type'        => $type,
+								'price'       => $price,
+								'purchase_id' => $id
+							) );
 						}
-						update_post_meta( $id, $ticket_id, array(
-							'type'        => $type,
-							'price'       => $price,
-							'purchase_id' => $id
-						) );
-					}
 
-					$ticket_array[] = add_query_arg( 'ticket_id', $ticket_id, get_permalink( $options['mt_tickets_page'] ) );
+						$ticket_array[] = add_query_arg( 'ticket_id', $ticket_id, get_permalink( $options['mt_tickets_page'] ) );
+					}
 				}
 			}
 		}
