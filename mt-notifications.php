@@ -242,7 +242,6 @@ function mt_send_notifications( $status = 'Completed', $details = array(), $erro
 	$receipt        = add_query_arg( 'receipt_id', $hash, get_permalink( $options['mt_receipt_page'] ) );
 	$transaction_id = get_post_meta( $id, '_transaction_id', true );
 
-
 	if ( $status == 'Completed' ) {
 		$amount_due = '0.00';
 	} else {

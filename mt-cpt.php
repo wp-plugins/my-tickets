@@ -105,7 +105,7 @@ function mt_default_fields() {
 				'default' => 'checked'
 			),
 			'total_paid'        => array(
-				'label'   => __( 'Total Paid', 'my-tickets' ),
+				'label'   => __( 'Tickets Total', 'my-tickets' ),
 				'input'   => 'text',
 				'default' => ''
 			),

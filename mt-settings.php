@@ -5,7 +5,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 function mt_update_settings( $post ) {
 	if ( isset( $post['mt-submit-settings'] ) ) {
-		$nonce = $_POST['_wpnonce'];
+		$nonce = isset( $_POST['_wpnonce'] ) ? $_POST['_wpnonce'] : false;
+		if ( !$nonce ) {
+			return;
+		}
 		if ( ! wp_verify_nonce( $nonce, 'my-tickets' ) ) {
 			return false;
 		}
@@ -182,11 +185,17 @@ function mt_settings() {
 										'handling',
 										'phone'
 									);
-									// TODO: Test custom template tag
+									/*
+									 * Add custom fields to display of template tags.
+									 */
 									$custom_fields = apply_filters( 'mt_custom_fields', array() );
 									foreach ( $custom_fields as $name => $field ) {
 										$tags[] = $name;
 									}
+									/*
+									 * Add custom tags that are not also custom fields.
+									 */
+									$tags      = apply_filters( 'mt_display_tags', $tags );
 									$tags      = array_map( 'mt_array_code', $tags );
 									$available = implode( ', ', $tags );
 									?>
@@ -207,37 +216,41 @@ function mt_settings() {
 					</div>
 				</div>
 			</div>
-			<?php
-				$fields = apply_filters( 'mt_license_fields', '' );
-				if ( $fields != '' ) {
-					?>
-					<div class="metabox-holder">
-						<div class="ui-sortable meta-box-sortables">
-							<div class="postbox">
-								<h3><?php _e( 'Premium Add-on License Keys', 'my-tickets' ); ?></h3>
-								<?php
-									if ( isset( $_POST['mt_license_keys'] ) && wp_verify_nonce( $_POST['_wpnonce_tickets'], 'my-tickets-licensing' ) ) {
-										echo "<div class='updated'><ul>" . apply_filters( 'mt_save_license', '', $_POST ) . "</ul></div>";
-									}
-								?>
-								<div class="inside">
-									<form method="post" action="<?php echo admin_url( "admin.php?page=my-tickets" ); ?>">
-										<div>
-											<input type="hidden" name="mt_license_keys" value="saved" />
-											<input type="hidden" name="_wpnonce_tickets" value="<?php echo wp_create_nonce( 'my-tickets-licensing' ); ?>"/>
-										</div>
+			<div class="metabox-holder">
+				<div class="ui-sortable meta-box-sortables">
+					<div class="postbox">
+						<h3><?php _e( 'Premium Add-on License Keys', 'my-tickets' ); ?></h3>
+						<?php
+							if ( isset( $_POST['mt_license_keys'] ) && wp_verify_nonce( $_POST['_wpnonce_tickets'], 'my-tickets-licensing' ) ) {
+								echo "<div class='updated'><ul>" . apply_filters( 'mt_save_license', '', $_POST ) . "</ul></div>";
+							}
+						?>
+						<div class="inside">
 
-									<ul>
-										<?php echo $fields; ?>
-									</ul>
-									</form>
+								<?php
+								$fields = apply_filters( 'mt_license_fields', '' );
+								if ( $fields != '' ) {
+								?>
+							<form method="post" action="<?php echo admin_url( "admin.php?page=my-tickets" ); ?>">
+								<div>
+									<input type="hidden" name="mt_license_keys" value="saved" />
+									<input type="hidden" name="_wpnonce_tickets" value="<?php echo wp_create_nonce( 'my-tickets-licensing' ); ?>"/>
 								</div>
-							</div>
+							<ul>
+								<?php echo $fields; ?>
+							</ul>
+								<p><input type="submit" name="mt-submit-settings" class="button-primary"
+								          value="<?php _e( 'Save License Keys', 'my-tickets' ); ?>"/></p>
+							</form>
+								<?php
+								} else {
+									echo "<p>" . __( 'If you install any My Tickets Premium Add-ons, the license fields will appear here.', 'my-tickets' ) . "</p>";
+								}
+								?>
 						</div>
 					</div>
-				<?php
-				}
-				?>
+				</div>
+			</div>
 		</div>
 		<?php mt_show_support_box(); ?>
 	</div>

@@ -394,9 +394,15 @@ function mt_generate_cart( $user_ID = false ) {
 			if ( mt_handling_notice() ) {
 				$output .= "<div class='mt_ticket_handling'>" . mt_handling_notice() . "</div>";
 			}
+			$custom_fields = apply_filters( 'mt_cart_custom_fields', array(), $cart, $gateway );
+			$custom_output = '';
+			foreach ( $custom_fields as $key => $field ) {
+				$custom_output .= $field;
+			}
 			$output .= "<div class='mt_cart_total' aria-live='assertive'>" . apply_filters( 'mt_cart_ticket_total_text', __( 'Ticket Total:', 'my-tickets' ), $current_gate ) . " <span class='mt_total_number'>" . apply_filters( 'mt_money_format', $total ) . "</span></div>\n" .
 			           mt_invite_login_or_register() . "\n" .
-			           mt_required_fields( $cart ) . "\n
+			           mt_required_fields( $cart ) . "\n" .
+			           $custom_output . "\n
 					<p class='mt_submit'><input type='submit' name='mt_submit' value='" . apply_filters( 'mt_submit_button_text', __( 'Place Order', 'my-tickets' ), $current_gate ) . "' /></p>\n
 					<input type='hidden' name='my-tickets' value='true' />
 				</form>" .
@@ -616,7 +622,7 @@ function mt_generate_gateway( $cart ) {
 	$mt_gateway     = isset( $_POST['mt_gateway'] ) ? $_POST['mt_gateway'] : 'offline';
 	$report_total   = "<div class='mt_cart_total'>" . apply_filters( 'mt_cart_total_text', __( 'Total:', 'my-tickets' ), $mt_gateway ) . " <span class='mt_total_number'>" . apply_filters( 'mt_money_format', $total + $shipping_total + $handling_total ) . "</span></div>";
 	$payment        = mt_get_data( 'payment' );
-	$args           = array( 'cart' => $cart, 'total' => $total, 'payment' => $payment, 'method' => $ticket_method );
+	$args           = apply_filters( 'mt_payment_form_args', array( 'cart' => $cart, 'total' => $total, 'payment' => $payment, 'method' => $ticket_method ) );
 	$form           = apply_filters( 'mt_gateway', '', $mt_gateway, $args );
 	$form           = apply_filters( 'mt_form_wrapper', $form );
 

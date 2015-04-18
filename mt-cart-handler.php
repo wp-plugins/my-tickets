@@ -180,7 +180,7 @@ function mt_generate_ticket_id( $purchase_id, $type, $i, $price ) {
 }
 
 /**
- * Calculates cost of cart. (Actual cost, after discounts.)
+ * Calculates cost of cart. (Actual cost, after discounts.) This is actually different from mt_total_cost(), but damned similar.
  *
  * @param $purchased
  *
@@ -193,8 +193,11 @@ function mt_calculate_cart_cost( $purchased ) {
 		if ( $prices ) {
 			foreach ( $tickets as $type => $ticket ) {
 				if ( (int) $ticket['count'] > 0 ) {
-					$price = $prices[ $type ]['price'] * $ticket['count'];
-					$total = $total + $price;
+					$price = ( isset( $prices[ $type ] ) ) ? $prices[ $type ]['price'] : '';
+					if ( $price ) {
+						$price = mt_handling_price( $price, $event_id );
+					}
+					$total = $total + ( $price * $ticket['count'] );
 				}
 			}
 		}

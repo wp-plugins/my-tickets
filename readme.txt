@@ -63,7 +63,8 @@ None yet!
 = Future =
 
 * Improve options when there are multiple dates available for a specific event. Multiple ticket patterns w/separate pricing & availability options, etc.? Note accessibility features?
-* Add 'Reservation' as admin-only payment status
+* Add 'Reservation' as payment status (admin-only by default)
+* Add 'Waiting List' as payment status (admin-only by default)
 
 = 1.0.5 =
 
@@ -72,6 +73,8 @@ None yet!
 * Save timestamp in custom field in order to create lists of tickets by date.
 * Print This Report button
 * Only display last month of events in reports dropdown.
+* Added more filters to further ability to extend My Tickets.
+* Text change for clarity in what "total" is.
 * Bug fix: re-sending email could create new tickets.
 * Bug fix: Use COOKIEPATH instead of SITECOOKIEPATH to support WP installed in a separate directory.
 
