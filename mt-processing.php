@@ -84,6 +84,7 @@ function mt_ticket_meta( $post_id ) {
 			update_post_meta( $post_id, '_mc_event_location', $_POST['mt-event-location'] );
 		}
 		update_post_meta( $post_id, '_mc_event_data', $data );
+		update_post_meta( $post_id, '_mc_event_date', strtotime( $_POST['event_begin'] ) );
 		mt_save_registration_data( $post_id, $_POST );
 	}
 

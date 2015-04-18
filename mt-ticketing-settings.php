@@ -10,6 +10,7 @@ function mt_update_ticketing_settings( $post ) {
 			return '';
 		}
 		$mt_handling         = ( isset( $post['mt_handling'] ) ) ? $post['mt_handling'] : 0;
+		$mt_ticket_handling  = ( isset( $post['mt_ticket_handling'] ) ) ? $post['mt_ticket_handling'] : 0;
 		$mt_shipping         = ( isset( $post['mt_shipping'] ) ) ? $post['mt_shipping'] : 0;
 		$mt_ticketing        = ( isset( $post['mt_ticketing'] ) ) ? $post['mt_ticketing'] : array();
 		$mt_total_tickets        = ( isset( $post['mt_tickets_total'] ) ) ? $post['mt_tickets_total'] : 'inherit';
@@ -18,16 +19,21 @@ function mt_update_ticketing_settings( $post ) {
 		$labels              = ( isset( $post['mt_label'] ) ) ? $post['mt_label'] : array();
 		$prices              = ( isset( $post['mt_price'] ) ) ? $post['mt_price'] : array();
 		$availability        = ( isset( $post['mt_tickets'] ) ) ? $post['mt_tickets'] : array();
+		$close_value         = ( isset( $post['mt_tickets_close_value'] ) ) ? $post['mt_tickets_close_value'] : '';
+		$close_type          = ( isset( $post['mt_tickets_close_type'] ) ) ? $post['mt_tickets_close_type'] : 'integer';
 		$pricing_array       = mt_setup_pricing( $labels, $prices, $availability );
 		$defaults['pricing'] = $pricing_array;
 		$defaults['tickets'] = $mt_total_tickets;
 
 		$settings = apply_filters( 'mt_settings', array(
-			'defaults'         => $defaults,
-			'mt_shipping'      => $mt_shipping,
-			'mt_handling'      => $mt_handling,
-			'mt_ticketing'     => $mt_ticketing,
-			'mt_shipping_time' => $mt_shipping_time,
+			'defaults'               => $defaults,
+			'mt_shipping'            => $mt_shipping,
+			'mt_handling'            => $mt_handling,
+			'mt_ticket_handling'     => $mt_ticket_handling,
+			'mt_ticketing'           => $mt_ticketing,
+			'mt_shipping_time'       => $mt_shipping_time,
+			'mt_tickets_close_value' => $close_value,
+			'mt_tickets_close_type'  => $close_type
 		), $_POST );
 		$settings = array_merge( get_option( 'mt_settings' ), $settings );
 		update_option( 'mt_settings', $settings );
@@ -90,8 +96,24 @@ function mt_ticketing_settings() {
 			</p>
 		</fieldset>";
 								$handling = ( isset( $options['mt_handling'] ) ) ? $options['mt_handling'] : '';
-								$form .= "<p class='handling'>
-					<label for='mt_handling'>" . __( 'Ticket Handling/Administrative Fee', 'my-tickets' ) . "</label> <input name='mt_handling' id='mt_handling' type='text' size='4' value='$handling' />
+								$form .= "<p class='handling cart-handling'>
+					<label for='mt_handling'>" . __( 'Handling/Administrative Fee (per Cart)', 'my-tickets' ) . "</label> <input name='mt_handling' id='mt_handling' type='text' size='4' value='$handling' />
+			</p>";
+								$ticket_handling = ( isset( $options['mt_ticket_handling'] ) ) ? $options['mt_ticket_handling'] : '';
+								$form .= "<p class='handling ticket-handling'>
+					<label for='mt_ticket_handling'>" . __( 'Handling/Administrative Fee (per Ticket)', 'my-tickets' ) . "</label> <input name='mt_ticket_handling' id='mt_ticket_handling' type='text' size='4' value='$ticket_handling' />
+			</p>";
+								$mt_tickets_close_value = ( isset( $options['mt_tickets_close_value'] ) ) ? $options['mt_tickets_close_value'] : '';
+								$form .= "<p class='handling ticket-close-value'>
+					<label for='mt_tickets_close_value'>" . __( 'Tickets reserved for sale at the door', 'my-tickets' ) . "</label> <input name='mt_tickets_close_value' id='mt_tickets_close_value' type='number' size='4' value='$mt_tickets_close_value' />
+			</p>";
+								$mt_tickets_close_type = ( isset( $options['mt_tickets_close_type'] ) ) ? $options['mt_tickets_close_type'] : '';
+								$form .= "<p class='handling ticket-close-type'>
+					<label for='mt_tickets_close_type'>" . __( 'Reserve tickets based on', 'my-tickets' ) . "</label>
+					<select name='mt_tickets_close_type' id='mt_tickets_close_type' />
+						<option value='integer'" . selected( $mt_tickets_close_type, 'integer', false ) . ">" . __( 'Specific number of tickets', 'my-tickets' ) . "</option>
+						<option value='percent'" . selected( $mt_tickets_close_type, 'percent', false ) . ">" . __( 'Percentage of available tickets', 'my-tickets' ) . "</option>
+					</select>
 			</p>";
 								echo $form;
 								?>

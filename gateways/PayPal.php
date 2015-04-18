@@ -146,10 +146,10 @@ function mt_gateway_paypal( $form, $gateway, $args ) {
 		<input type='hidden' name='currency_code' value='" . esc_attr( $currency ) . "' />";
 		$form .= "
 		<input type='hidden' name='notify_url' value='" . mt_replace_http( add_query_arg( 'mt_paypal_ipn', 'true', esc_url( home_url() ) . '/' ) ) . "' />
-		<input type='hidden' name='return' value='" . mt_replace_http( add_query_arg( array(
+		<input type='hidden' name='return' value='" . mt_replace_http( esc_url( add_query_arg( array(
 						'response_code' => 'thanks',
 						'gateway'       => 'paypal'
-					), esc_url( get_permalink( $options['mt_purchase_page'] ) ) ) ) . "' />
+					), esc_url( get_permalink( $options['mt_purchase_page'] ) ) ) ) ) . "' />
 		<input type='hidden' name='cancel_return' value='" . mt_replace_http( add_query_arg( 'response_code', 'cancel', esc_url( get_permalink( $options['mt_purchase_page'] ) ) ) ) . "' />";
 		/* This might be part of handling discount codes.
 		if ( $discount == true && $discount_rate > 0 ) {

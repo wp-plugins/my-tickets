@@ -86,6 +86,9 @@ function mt_create_payment( $post ) {
 	}
 	update_post_meta( $purchase_id, '_first_name', $post['mt_fname'] );
 	update_post_meta( $purchase_id, '_last_name', $post['mt_lname'] );
+	if ( isset( $options[ 'mt_ticket_handling' ] ) && is_numeric( $options[ 'mt_ticket_handling' ] ) ) {
+		update_post_meta( $purchase_id, '_ticket_handling', $options['mt_ticket_handling'] );
+	}
 	$email = $post['mt_email'];
 	update_post_meta( $purchase_id, '_email', $email );
 	$phone = ( isset( $post['mt_phone']) ) ? $post['mt_phone'] : '';

@@ -64,9 +64,16 @@ None yet!
 
 * Improve options when there are multiple dates available for a specific event. Multiple ticket patterns w/separate pricing & availability options, etc.? Note accessibility features?
 * Add 'Reservation' as admin-only payment status
+
+= 1.0.5 =
+
 * Per-ticket handling fee
+* Shut off online ticket sales when 'x' tickets or 'x' percentage of total tickets are left.
+* Save timestamp in custom field in order to create lists of tickets by date.
 * Print This Report button
-* Shut off ticket sales when 'x' tickets are left.
+* Only display last month of events in reports dropdown.
+* Bug fix: re-sending email could create new tickets.
+* Bug fix: Use COOKIEPATH instead of SITECOOKIEPATH to support WP installed in a separate directory.
 
 = 1.0.4 =
 
@@ -123,4 +130,4 @@ This is a brand new plug-in; but I'm sure you'll have questions in time! Meanwhi
 
 = 1.0.0 =
 
-1.0.4: Several important bug fixes, improvements to purchase reporting.
+1.0.5: Bug fixes & new features.

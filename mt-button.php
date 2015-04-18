@@ -88,6 +88,7 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 	if ( $no_postal && count( $options['mt_ticketing'] ) == 1 && in_array( 'postal', $options['mt_ticketing'] ) && ! ( current_user_can( 'mt-order-expired' ) || current_user_can( 'manage_options' ) ) ) {
 		$expired = true;
 	}
+	$handling_notice = '';
 	if ( ! $expired ) {
 		if ( is_array( $registration ) ) {
 			$pricing = $registration['prices'];
@@ -105,15 +106,16 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 				$available = $registration['total'];
 				// if multiple != true, use checkboxes
 				$input_type        = ( isset( $registration['multiple'] ) && $registration['multiple'] == 'true' ) ? 'number' : 'checkbox';
-				$tickets_remaining = mt_tickets_left( $pricing, $available );
-				$tickets_remaining = $tickets_remaining['remain'];
-				$tickets_sold      = $tickets_remaining['sold'];
-				if ( $tickets_remaining ) {
+				$tickets_data      = mt_tickets_left( $pricing, $available );
+				$tickets_remaining = $tickets_data['remain'];
+				$tickets_sold      = $tickets_data['sold'];
+				if ( $tickets_remaining && $tickets_remaining > apply_filters( 'mt_tickets_close_value', 0, $event_id, $tickets_data ) ) {
 					$sold_out    = false;
 					$total_order = 0;
 					foreach ( $pricing as $type => $settings ) {
 						if ( $type ) {
-							$price      = $settings['price'];
+							$price      = mt_handling_price( $settings['price'], $event );
+							$handling_notice = mt_handling_notice();
 							$price      = apply_filters( 'mt_money_format', mt_calculate_discount( $price ) );
 							$value      = ( is_array( $cart_data ) && isset( $cart_data[ $type ] ) ) ? $cart_data[ $type ] : '';
 							$attributes = '';
@@ -157,7 +159,11 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 						}
 					}
 				} else {
-					$sold_out = true;
+					if ( $tickets_remaining == 0 ) {
+						$sold_out = true;
+					} else {
+						$output = "<p>" . mt_tickets_remaining( $tickets_data, $event_id ) . "</p>";
+					}
 				}
 			}
 			if ( $available != 'inherit' ) {
@@ -175,6 +181,7 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 			<div class='mt-response' id='mt-response-$event_id' aria-live='assertive'></div>
 			$no_post
 			$closing_time
+			$handling_notice
 			<form action='" . esc_url( $permalink ) . "' method='POST' class='ticket-orders' id='order-tickets' tabindex='-1'>
 				<div>
 					$nonce
@@ -201,12 +208,7 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 		$available = $registration['total'];
 		$pricing = $registration['prices'];
 		$tickets_remaining = mt_tickets_left( $pricing, $available );
-		$tickets_remaining = $tickets_remaining['remain'];
-		if ( $tickets_remaining > 0 ) {
-			$tickets_remain_text = ' ' . sprintf( apply_filters( 'mt_tickets_still_remaining_text', __( 'There are still %d tickets available at the box office!', 'my-tickets' ) ), $tickets_remaining );
-		} else {
-			$tickets_remain_text = '';
-		}
+		$tickets_remain_text = mt_tickets_remaining( $tickets_remaining, $event_id );
 		$sales_closed = ( $registration['sales_type'] == 'registration' ) ? __( 'Online registration for this event is closed', 'my-tickets' ) : __( 'Online ticket sales for this event are closed.', 'my-tickets' );
 		$output      = "<p>" . apply_filters( 'mt_sales_closed', $sales_closed ) . "$tickets_remain_text</p>";
 	}
@@ -215,10 +217,84 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 		$tickets_soldout = ( $registration['sales_type'] == 'registration' ) ? __( 'Registration for this event is full', 'my-tickets' ) : __( 'Tickets for this event are sold out.', 'my-tickets' );
 		$output          = "<p>" . apply_filters( 'mt_tickets_soldout', $tickets_soldout ) . "</p>";
 	}
-
 	return $content . $output;
 }
 
+/**
+ * Produce notice about tickets remaining after sales are closed.
+ *
+ * @param $tickets_remaining array of ticket sales data
+ * @param $event_id Event ID
+ *
+ * @return string Notice
+ */
+function mt_tickets_remaining( $tickets_data, $event_id ) {
+	$tickets_remaining = $tickets_data['remain'];
+	if ( $tickets_remaining && $tickets_remaining > apply_filters( 'mt_tickets_close_value', 0, $event_id, $tickets_data )  ) {
+		$tickets_remain_text = '';
+	} else {
+		if ( $tickets_remaining > 0 ) {
+			$tickets_remain_text = ' ' . sprintf( apply_filters( 'mt_tickets_still_remaining_text', __( 'There are still %d tickets available at the box office!', 'my-tickets' ) ), $tickets_remaining );
+		} else {
+			$tickets_remain_text = '';
+		}
+	}
+
+	return $tickets_remain_text;
+}
+
+add_filter( 'mt_tickets_close_value', 'mt_close_ticket_sales', 10, 3 );
+/**
+ * Customize when events will close for ticket sales, to reserve some tickets for door sales.
+ *
+ * @param $limit integer Point where ticket sales will close. Default: 0
+ * @param $event_id integer Event ID, in case somebody wanted some further customization.
+ * @param $remaining array: remaining, sold, and total tickets available.
+ *
+ * @return $limit new value where ticket sales are closed for an event.
+ */
+function mt_close_ticket_sales( $limit, $event_id, $remaining ) {
+	$options            = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
+	$tickets_close_at   = ( isset( $options['mt_tickets_close_value'] ) && is_numeric( $options['mt_tickets_close_value'] ) ) ? $options['mt_tickets_close_value'] : 0;
+	$tickets_close_type =  ( isset( $options['mt_tickets_close_type'] ) ) ? $options['mt_tickets_close_type'] : 'integer';
+	switch( $tickets_close_type ) {
+		case 'integer': $limit = $tickets_close_at; break;
+		case 'percent': $limit = round( ( $tickets_close_at/100 ) * $remaining['total'] ); break;
+	}
+
+	return apply_filters( 'mt_custom_event_limit', $limit, $event_id, $remaining );
+}
+
+/**
+ * Produce price if a per-ticket handling charge is being applied.
+ *
+ * @param $price Original price without handling.
+ * @param $event Event ID
+ *
+ * @return new price
+ */
+function mt_handling_price( $price, $event ) {
+	$options      = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
+	if ( isset( $options['mt_ticket_handling' ] ) && is_numeric( $options['mt_ticket_handling' ] ) ) {
+		$price  = $price + apply_filters( 'mt_ticket_handling_price', $options['mt_ticket_handling'], $event );
+	}
+	return $price;
+}
+
+/**
+ * Produce price if a per-ticket handling charge is being applied.
+ *
+ * @return handling notice
+ */
+function mt_handling_notice() {
+	$options      = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
+	if ( isset( $options['mt_ticket_handling' ] ) && is_numeric( $options['mt_ticket_handling' ] ) ) {
+		$handling_notice = apply_filters( 'mt_ticket_handling_notice', sprintf( __( 'Tickets include a %s ticket handling charge', 'my-tickets' ), apply_filters( 'mt_money_format', $options['mt_ticket_handling'] ) ) );
+	} else {
+		$handling_notice = '';
+	}
+	return $handling_notice;
+}
 /**
  * Get closing date/time for event
  *
@@ -282,7 +358,7 @@ function mt_tickets_left( $pricing, $available ) {
 	if ( $total == 0 ) {
 		return false;
 	} else {
-		return array( 'remain' => $total, 'sold' => $sold );
+		return array( 'remain' => $total, 'sold' => $sold, 'total' => $sold + $total );
 	}
 }
 
@@ -444,11 +520,15 @@ function mt_save_data( $passed, $type = 'cart', $override = false ) {
 }
 
 add_action( 'init', 'mt_set_user_unique_id' );
+/**
+ * Note: if sitecookiepath doesn't match the site's render location, this won't work.
+ * It'll also create a secondary issue where AJAX actions read the sitecookiepath cookie.
+*/
 function mt_set_user_unique_id() {
 	$unique_id = ( isset( $_COOKIE['mt_unique_id'] ) ) ? $_COOKIE['mt_unique_id'] : false;
 	if ( !$unique_id ) {
 		$unique_id = mt_generate_unique_id();
-		setcookie( "mt_unique_id", $unique_id, time() + 60 * 60 * 24 * 7, SITECOOKIEPATH, COOKIE_DOMAIN, false, true );
+		setcookie( "mt_unique_id", $unique_id, time() + 60 * 60 * 24 * 7, COOKIEPATH, COOKIE_DOMAIN, false, true );
 	}
 }
 

@@ -188,8 +188,8 @@ function mt_add_uneditable() {
 		$discount_text = ( $discount != '' ) ? sprintf( __( " @ %d&#37; member discount", 'my-tickets' ), $discount ) : '';
 
 		$tickets          = mt_setup_tickets( $purchase, $post_id );
-		$ticket_data      = "<div class='ticket-data panel'><div class='inner'><h4>" . __( 'Tickets', 'my-tickets' ) . "</h4>" . mt_format_tickets( $tickets, 'html' ) . "</div></div>";
-		$purchase_data    = "<div class='transaction-purchase panel'><div class='inner'><h4>" . __( 'Receipt ID:', 'my-tickets' ) . " <code>$receipt</code></h4>" . mt_format_purchase( $purchase, 'html' ) . "</div></div>";
+		$ticket_data      = "<div class='ticket-data panel'><div class='inner'><h4>" . __( 'Tickets', 'my-tickets' ) . "</h4>" . mt_format_tickets( $tickets, 'html', $post_id ) . "</div></div>";
+		$purchase_data    = "<div class='transaction-purchase panel'><div class='inner'><h4>" . __( 'Receipt ID:', 'my-tickets' ) . " <code>$receipt</code></h4>" . mt_format_purchase( $purchase, 'html', $post_id ) . "</div></div>";
 		$gateway          = get_post_meta( $post_id, '_gateway', true );
 		$transaction_data = "<div class='transaction-data $gateway panel'><div class='inner'><h4>" . __( 'Paid through:', 'my-tickets' ) . " <code>$gateway</code>$discount_text</h4>" . apply_filters( 'mt_format_transaction', get_post_meta( $post_id, '_transaction_data', true ), get_post_meta( $post_id, '_gateway', true ) ) . "</div></div>";
 
@@ -749,16 +749,16 @@ function mt_bulk_action() {
 					$completed ++;
 				}
 				// build the redirect url
-				$sendback = add_query_arg( array(
+				$sendback = esc_url( add_query_arg( array(
 						'completed' => $completed,
 						'ids'       => join( ',', $post_ids )
-					), $sendback );
+					), $sendback ) );
 				break;
 			default:
 				return;
 		}
 
-		$sendback = remove_query_arg( array(
+		$sendback = esc_url( remove_query_arg( array(
 				'action',
 				'action2',
 				'tags_input',
@@ -769,7 +769,7 @@ function mt_bulk_action() {
 				'post',
 				'bulk_edit',
 				'post_view'
-			), $sendback );
+			), $sendback ) );
 
 		wp_redirect( $sendback );
 		exit();

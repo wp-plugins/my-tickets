@@ -33,6 +33,10 @@ function mt_reports_page() {
 							} else {
 								mt_generate_report_by_event();
 							}
+							$event_id = (int) $_GET['event_id'];
+							$report_type = ( isset( $_GET['mt-event-report'] ) && $_GET['mt-event-report'] == 'tickets' ) ? 'tickets' : 'purchases';
+							$print_report_url = admin_url( 'admin.php?page=mt-reports&event_id=' . $event_id . '&mt-event-report=' . $report_type . '&format=view&mt_print=true' );
+							echo '<p><a class="button" href="' . $print_report_url . '">' . __( 'Print this report', 'my-tickets' ) . '</a></p>';
 						}
 						?>
 						<div class="mt-report-selector">
@@ -57,7 +61,7 @@ function mt_reports_page() {
  *
  * @param bool $event_id
  */
-function mt_generate_tickets_by_event( $event_id = false ) {
+function mt_generate_tickets_by_event( $event_id = false, $return = false ) {
 	if ( current_user_can( 'mt-view-reports' ) || current_user_can( 'manage_options' ) ) {
 		$event_id = ( isset( $_GET['event_id'] ) ) ? (int) $_GET['event_id'] : $event_id;
 		if ( $event_id ) {
@@ -87,10 +91,18 @@ function mt_generate_tickets_by_event( $event_id = false ) {
 			}
 			$table = $table_top . $table_bottom;
 			$output .= $table;
-			echo "<p class='totals'>" . sprintf( __( '%1$s tickets sold.', 'my-tickets' ), "<strong>$total_tickets</strong>") . "</p>" . $output;
+			if ( $return ) {
+				return "<p class='totals'>" . sprintf( __( '%1$s tickets sold.', 'my-tickets' ), "<strong>$total_tickets</strong>" ) . "</p>" . $output;
+			} else {
+				echo "<p class='totals'>" . sprintf( __( '%1$s tickets sold.', 'my-tickets' ), "<strong>$total_tickets</strong>" ) . "</p>" . $output;
+			}
 		}
 	} else {
-		echo "<div class='updated error'><p>" . __( 'You do not have sufficient permissions to view ticketing reports.', 'my-tickets' ) . "</p></div>";
+		if ( $return ) {
+			return false;
+		} else {
+			echo "<div class='updated error'><p>" . __( 'You do not have sufficient permissions to view ticketing reports.', 'my-tickets' ) . "</p></div>";
+		}
 	}
 }
 
@@ -100,7 +112,7 @@ function mt_generate_tickets_by_event( $event_id = false ) {
  *
  * @param bool $event_id
  */
-function mt_generate_report_by_event( $event_id = false ) {
+function mt_generate_report_by_event( $event_id = false, $return = false ) {
 	if ( current_user_can( 'mt-view-reports' ) || current_user_can( 'manage_options' ) ) {
 		$event_id = ( isset( $_GET['event_id'] ) ) ? (int) $_GET['event_id'] : $event_id;
 		if ( $event_id ) {
@@ -163,10 +175,18 @@ function mt_generate_report_by_event( $event_id = false ) {
 			}
 
 			$output .= $out . "</div>";
-			echo "<p class='totals'>" . sprintf( __( '%1$s tickets sold in %3$s purchases. Total sales: %2$s', 'my-tickets' ), "<strong>$total_tickets</strong>", "<strong>".apply_filters( 'mt_money_format', $total_income ) ."</strong>", "<strong>$total_sales</strong>" ) . "</p>" . $output;
+			if ( $return ) {
+				return "<p class='totals'>" . sprintf( __( '%1$s tickets sold in %3$s purchases. Total sales: %2$s', 'my-tickets' ), "<strong>$total_tickets</strong>", "<strong>" . apply_filters( 'mt_money_format', $total_income ) . "</strong>", "<strong>$total_sales</strong>" ) . "</p>" . $output;
+			} else {
+				echo "<p class='totals'>" . sprintf( __( '%1$s tickets sold in %3$s purchases. Total sales: %2$s', 'my-tickets' ), "<strong>$total_tickets</strong>", "<strong>" . apply_filters( 'mt_money_format', $total_income ) . "</strong>", "<strong>$total_sales</strong>" ) . "</p>" . $output;
+			}
 		}
 	} else {
-		echo "<div class='updated error'><p>" . __( 'You do not have sufficient permissions to view sales reports.', 'my-tickets' ) . "</p></div>";
+		if ( $return ) {
+			return false;
+		} else {
+			echo "<div class='updated error'><p>" . __( 'You do not have sufficient permissions to view sales reports.', 'my-tickets' ) . "</p></div>";
+		}
 	}
 }
 
@@ -284,6 +304,7 @@ function mt_email_purchasers() {
 function mt_select_events() {
 	// fetch posts with meta data for event sales
 	$settings = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
+	// add time query to this query after timestamp field has been in place for a few months.
 	$args    =
 		array(
 			'post_type'   => $settings['mt_post_types'],
@@ -303,7 +324,13 @@ function mt_select_events() {
 		$tickets  = get_post_meta( $post->ID, '_ticket' );
 		$count    = count( $tickets );
 		$selected = ( isset( $_GET['event_id'] ) && $_GET['event_id'] == $post->ID ) ? ' selected="selected"' : '';
-		$options .= "<option value='$post->ID'$selected>$post->post_title ($count)</option>\n";
+		$event_data = get_post_meta( $post->ID, '_mc_event_data', true );
+		$event_date = strtotime( $event_data['event_begin'] );
+		// if this event happened more than a month ago, don't show in list *unless* it's the currently selected report.
+		$report_age_limit = apply_filters( 'mt_reports_age_limit', current_time( 'timestamp' ) - 31*24*60*60 );
+		if ( $event_date > $report_age_limit || $selected == ' selected="selected"' ) {
+			$options .= "<option value='$post->ID'$selected>$post->post_title ($count)</option>\n";
+		}
 	}
 
 	return $options;
@@ -415,7 +442,7 @@ function mt_get_tickets( $event_id ) {
 			$last_name = end( $name );
 		}
 		$alternate                   = ( $alternate == 'alternate' ) ? 'even' : 'alternate';
-		$row                         = "<tr class='$alternate'><th scope='row'>$ticket_id</th><td>$type</td><td>$purchaser</td><td><a href=" . get_edit_post_link( $purchase_id ) . ">$purchase_id</a></td><td>" . apply_filters( 'mt_money_format', $price ) . "</td></tr>";
+		$row                         = "<tr class='$alternate'><th scope='row'>$ticket_id</th><td>$type</td><td>$purchaser</td><td><a href='" . get_edit_post_link( $purchase_id ) . "'>$purchase_id</a></td><td>" . apply_filters( 'mt_money_format', $price ) . "</td></tr>";
 		// add split field to csv headers
 		$csv                         = "\"$ticket_id\",\"$last_name\",\"$first_name\",\"$type\",\"$purchase_id\",\"$price\"".PHP_EOL;
 		$report['html'][] = $row;
@@ -423,6 +450,43 @@ function mt_get_tickets( $event_id ) {
 	}
 
 	return $report;
+}
+
+add_action( 'admin_init', 'mt_printable_report' );
+/**
+ * View printable version of table report.
+ */
+function mt_printable_report() {
+
+	if ( isset( $_GET['mt_print'] ) ) {
+		$event_id = ( isset( $_GET['event_id'] ) ) ? (int) $_GET['event_id'] : false;
+		if ( !$event_id ) {
+			exit;
+		}
+		if ( isset( $_GET['mt-event-report'] ) && $_GET['mt-event-report'] == 'tickets' ) {
+			$report = mt_generate_tickets_by_event( $event_id, true );
+		} else {
+			$report = mt_generate_report_by_event( $event_id, true );
+		}
+		$stylesheet_path = apply_filters( 'mt_printable_report_css', plugins_url( 'css/report.css', __FILE__ ) );
+		$back_url = admin_url( 'admin.php?page=mt-reports' );
+		?>
+<!DOCTYPE html>
+<html <?php language_attributes(); ?>>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=<?php bloginfo('charset'); ?>" />
+		<meta name="viewport" content="width=device-width" />
+		<title><?php _e( 'Printable Sales Report', 'my-tickets' ); ?></title>
+	    <link href="<?php echo $stylesheet_path; ?>" type="text/css" media="print,screen" rel="stylesheet" />
+	</head>
+	<body>
+		<a class='mt-back' href="<?php echo $back_url; ?>"><?php _e( 'Return to My Tickets Reports', 'my-tickets' ); ?></a>
+		<?php echo $report; ?>
+	</body>
+</html>
+<?php
+		exit;
+	}
 }
 
 add_action( 'admin_init', 'mt_download_csv_event' );

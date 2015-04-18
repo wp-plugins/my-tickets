@@ -391,6 +391,9 @@ function mt_generate_cart( $user_ID = false ) {
 			if ( $handling_total != 0 ) {
 				$output .= "<div class='mt_cart_handling'>" . apply_filters( 'mt_cart_handling_text', sprintf( __( 'A handling fee of %s will be applied to this purchase.', 'my-tickets' ), $handling ), $current_gate ) . "</div>";
 			}
+			if ( mt_handling_notice() ) {
+				$output .= "<div class='mt_ticket_handling'>" . mt_handling_notice() . "</div>";
+			}
 			$output .= "<div class='mt_cart_total' aria-live='assertive'>" . apply_filters( 'mt_cart_ticket_total_text', __( 'Ticket Total:', 'my-tickets' ), $current_gate ) . " <span class='mt_total_number'>" . apply_filters( 'mt_money_format', $total ) . "</span></div>\n" .
 			           mt_invite_login_or_register() . "\n" .
 			           mt_required_fields( $cart ) . "\n
@@ -486,10 +489,7 @@ function mt_generate_cart_table( $cart, $format = 'cart' ) {
 				$currency     = $options['mt_currency'];
 				$event        = get_post( $event_id );
 				$title        = apply_filters( 'mt_link_title', $event->post_title, $event );
-				$image        = ( has_post_thumbnail( $event_id ) ) ? get_the_post_thumbnail( $event_id, array(
-					80,
-					80
-				) ) : '';
+				$image        = ( has_post_thumbnail( $event_id ) ) ? get_the_post_thumbnail( $event_id, array( 80, 80 ) ) : '';
 				$data         = get_post_meta( $event_id, '_mc_event_data', true );
 				$registration = get_post_meta( $event_id, '_mt_registration_options', true );
 				$date         = $data['event_begin'] . ' ' . $data['event_time'];
@@ -498,7 +498,7 @@ function mt_generate_cart_table( $cart, $format = 'cart' ) {
 					foreach ( $order as $type => $count ) {
 						if ( $count > 0 ) {
 							if ( isset( $prices[ $type ] ) ) {
-								$price = $prices[ $type ]['price'];
+								$price = mt_handling_price( $prices[ $type ]['price'], $event_id );
 								$label = $prices[ $type ]['label'];
 								if ( $format == 'cart' || is_admin() ) {
 									$hidden = "
@@ -554,6 +554,9 @@ function mt_total_cart( $cart ) {
 					foreach ( $order as $type => $count ) {
 						if ( $count > 0 ) {
 							$price = ( isset( $prices[ $type ] ) ) ? $prices[ $type ]['price'] : '';
+							if ( $price ) {
+								$price = mt_handling_price( $price, $event );
+							}
 							$total = $total + ( $price * $count );
 						}
 					}
@@ -609,6 +612,7 @@ function mt_generate_gateway( $cart ) {
 	$handling_total = ( isset( $options['mt_handling'] ) ) ? $options['mt_handling'] : 0;
 	$shipping       = ( $shipping_total ) ? "<div class='mt_cart_shipping'>" . __( 'Shipping:', 'my-tickets' ) . " <span class='mt_shipping_number'>" . apply_filters( 'mt_money_format', $shipping_total ) . "</span></div>" : '';
 	$handling       = ( $handling_total ) ? "<div class='mt_cart_handling'>" . __( 'Handling:', 'my-tickets' ) . " <span class='mt_handling_number'>" . apply_filters( 'mt_money_format', $handling_total ) . "</span></div>" : '';
+	$tick_handling  = mt_handling_notice();
 	$mt_gateway     = isset( $_POST['mt_gateway'] ) ? $_POST['mt_gateway'] : 'offline';
 	$report_total   = "<div class='mt_cart_total'>" . apply_filters( 'mt_cart_total_text', __( 'Total:', 'my-tickets' ), $mt_gateway ) . " <span class='mt_total_number'>" . apply_filters( 'mt_money_format', $total + $shipping_total + $handling_total ) . "</span></div>";
 	$payment        = mt_get_data( 'payment' );
@@ -616,7 +620,7 @@ function mt_generate_gateway( $cart ) {
 	$form           = apply_filters( 'mt_gateway', '', $mt_gateway, $args );
 	$form           = apply_filters( 'mt_form_wrapper', $form );
 
-	return $link . $confirmation . $shipping . $handling . $report_total . $form;
+	return $link . $confirmation . $shipping . $handling . $tick_handling . $report_total . $form;
 }
 
 add_filter( 'mt_form_wrapper', 'mt_wrap_payment_button' );

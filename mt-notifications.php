@@ -51,7 +51,7 @@ function mt_generate_notifications( $id ) {
 	return;
 }
 
-add_filter( 'mt_format_array', 'mt_format_array', 10, 3 );
+add_filter( 'mt_format_array', 'mt_format_array', 10, 4 );
 /**
  * Format array data for use in email notifications.
  *
@@ -61,17 +61,17 @@ add_filter( 'mt_format_array', 'mt_format_array', 10, 3 );
  *
  * @return string
  */
-function mt_format_array( $output, $type, $data ) {
+function mt_format_array( $output, $type, $data, $transaction_id ) {
 	if ( is_array( $data ) ) {
 		switch ( $type ) {
 			case 'purchase' :
-				$output = mt_format_purchase( $data );
+				$output = mt_format_purchase( $data, false, $transaction_id );
 				break;
 			case 'address' :
-				$output = mt_format_address( $data );
+				$output = mt_format_address( $data, false, $transaction_id  );
 				break;
 			case 'tickets' :
-				$output = mt_format_tickets( $data );
+				$output = mt_format_tickets( $data, 'text', $transaction_id  );
 				break;
 		}
 	}
@@ -87,7 +87,7 @@ function mt_format_array( $output, $type, $data ) {
  *
  * @return string
  */
-function mt_format_purchase( $purchase, $format = false ) {
+function mt_format_purchase( $purchase, $format = false, $purchase_id ) {
 	$output  = '';
 	$options = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
 	// format purchase
@@ -99,29 +99,38 @@ function mt_format_purchase( $purchase, $format = false ) {
 		$total   = 0;
 		foreach ( $purchase as $event ) {
 			foreach ( $event as $id => $tickets ) {
+				$handling = get_post_meta( $purchase_id, '_ticket_handling', true );
+				if ( !( $handling && is_numeric( $handling ) ) ) {
+					$handling = 0;
+				}
 				$title = ( $is_html ) ? "<strong>" . get_the_title( $id ) . "</strong>" : get_the_title( $id );
 				$event = get_post_meta( $id, '_mc_event_data', true );
 				$date  = date_i18n( get_option( 'date_format' ), strtotime( $event['event_begin'] ) );
 				$time  = date_i18n( get_option( 'time_format' ), strtotime( $event['event_time'] ) );
 				$output .= $title . $sep . $date . ' @ ' . $time . $sep . $sep;
+				$handling_notice = '';
 				foreach ( $tickets as $type => $ticket ) {
 					if ( $ticket['count'] > 0 ) {
-						$total = $total + $ticket['price'] * $ticket['count'];
-						$type  = ucfirst( str_replace( '-', ' ', $type ) );
+						$total    = $total + $ticket['price'] * $ticket['count'];
+						$type     = ucfirst( str_replace( '-', ' ', $type ) );
+						$price = $ticket['price'] - $handling;
+						if ( $handling ) {
+							$handling_notice = ' ' . apply_filters( 'mt_handling_charge_of', sprintf( __( '(Per-ticket handling charge of %s)', 'my-tickets' ), apply_filters( 'mt_money_format', $handling ) ) );
+						}
 						if ( $is_html ) {
 							$output .= sprintf(
 								           _n( '%1$s: 1 ticket at %2$s', '%1$s: %3$d tickets at %2$s', $ticket['count'], 'my-tickets' ),
 								           "<strong>" . $type . "</strong>",
-								           strip_tags( apply_filters( 'mt_money_format', $ticket['price'] ) ),
+								           strip_tags( apply_filters( 'mt_money_format', $price ) ),
 								           $ticket['count']
-							           ) . $sep;
+							           ) . $handling_notice . $sep;
 						} else {
 							$output .= sprintf(
 								           _n( '%1$s: 1 ticket at %2$s', '%1$s: %3$d tickets at %2$s', $ticket['count'], 'my-tickets' ),
 								           $type,
-								           strip_tags( apply_filters( 'mt_money_format', $ticket['price'] ) ),
+								           strip_tags( apply_filters( 'mt_money_format', $price ) ),
 								           $ticket['count']
-							           ) . $sep;
+							           ) . $handling_notice . $sep;
 						}
 					}
 				}
@@ -139,7 +148,7 @@ function mt_format_purchase( $purchase, $format = false ) {
  *
  * @return string
  */
-function mt_format_address( $address ) {
+function mt_format_address( $address, $format = false, $purchase_id ) {
 	// format address
 	$output = '';
 	if ( $address ) {
@@ -163,7 +172,7 @@ function mt_format_address( $address ) {
  *
  * @return string
  */
-function mt_format_tickets( $tickets, $type = 'text' ) {
+function mt_format_tickets( $tickets, $type = 'text', $purchase_id ) {
 	$options = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
 	$output  = '';
 	$is_html = ( $options['mt_html_email'] == 'true' || $type == 'html' ) ? true : false;
@@ -214,7 +223,11 @@ function mt_send_notifications( $status = 'Completed', $details = array(), $erro
 
 	// restructure post meta array to match cart array
 	if ( $status == 'Completed' || ( $status == 'Pending' && $gateway == 'offline' ) ) {
-		mt_create_tickets( $id );
+		if ( isset( $_POST['_send_email'] ) && $_POST['_send_email'] == 'true' ) {
+			// don't create tickets.
+		} else {
+			mt_create_tickets( $id );
+		}
 	}
 	$purchased    = get_post_meta( $id, '_purchased' );
 	$purchase_data = get_post_meta( $id, '_purchase_data', true );
@@ -241,7 +254,7 @@ function mt_send_notifications( $status = 'Completed', $details = array(), $erro
 	$address          = ( isset( $transaction_data['shipping'] ) ) ? $transaction_data['shipping'] : false;
 	$ticketing_method = get_post_meta( $id, '_ticketing_method', true );
 	if ( $ticketing_method == 'eticket' || $ticketing_method == 'printable' ) {
-		$tickets = apply_filters( 'mt_format_array', '', 'tickets', $ticket_array );
+		$tickets = apply_filters( 'mt_format_array', '', 'tickets', $ticket_array, $transaction_id );
 	} else {
 		$tickets = ( $ticketing_method == 'willcall' ) ? __( 'Your tickets will be available at the box office.', 'my-tickets' ) : __( 'Your tickets will be mailed to you at the address provided.', 'my-tickets' );
 		$tickets = ( $options['mt_html_email'] == 'true' ) ? "<p>" . $tickets . "</p>" : $tickets;
@@ -253,9 +266,9 @@ function mt_send_notifications( $status = 'Completed', $details = array(), $erro
 		'blogname'       => $blogname,
 		'total'          => $total,
 		'key'            => $hash,
-		'purchase'       => apply_filters( 'mt_format_array', '', 'purchase', $purchased ),
-		'address'        => apply_filters( 'mt_format_array', '', 'address', $address ),
-		'transaction'    => apply_filters( 'mt_format_array', '', 'transaction', $transaction_data ),
+		'purchase'       => apply_filters( 'mt_format_array', '', 'purchase', $purchased, $transaction_id ),
+		'address'        => apply_filters( 'mt_format_array', '', 'address', $address, $transaction_id ),
+		'transaction'    => apply_filters( 'mt_format_array', '', 'transaction', $transaction_data, $transaction_id ),
 		'transaction_id' => $transaction_id,
 		'amount_due'     => $amount_due,
 		'handling'       => apply_filters( 'mt_money_format', $handling ),
