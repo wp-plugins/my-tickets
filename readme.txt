@@ -5,7 +5,7 @@ Tags: events, ticket sales, tickets, ticketing, registration, reservations, even
 Requires at least: 4.0
 Tested up to: 4.2
 License: GPLv2 or later
-Stable tag: 1.0.4
+Stable tag: 1.0.5
 
 My Tickets is an easy-to-use, flexible platform for selling event tickets.
 
