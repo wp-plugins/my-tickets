@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Example minimal usage:
  
-add_filter( 'mt_custom_fields', 'create_custom_fields' );
+add_filter( 'mt_custom_fields', 'create_custom_fields', 10, 2 );
 function create_custom_fields( $array ) {
 	// Other fields: sanitize callback; input type; input values; display_callback
 	$array['test_event_data'] = array( 
@@ -77,7 +77,7 @@ function mt_apply_custom_field( $field, $event_id ) {
  * @return string
  */
 function mt_custom_field( $fields, $event_id ) {
-	$custom_fields = apply_filters( 'mt_custom_fields', array() );
+	$custom_fields = apply_filters( 'mt_custom_fields', array(), 'input' );
 	$output        = '';
 	foreach ( $custom_fields as $name => $field ) {
 		$continue = mt_apply_custom_field( $field, $event_id );
@@ -138,7 +138,7 @@ function mt_custom_field( $fields, $event_id ) {
  * @param $submit array
  */
 function mt_handle_custom_field( $saved, $submit ) {
-	$custom_fields = apply_filters( 'mt_custom_fields', array() );
+	$custom_fields = apply_filters( 'mt_custom_fields', array(), 'sanitize' );
 	foreach ( $custom_fields as $name => $field ) {
 		if ( isset( $submit[ $name ] ) ) {
 			if ( ! isset( $field['sanitize_callback'] ) ) {
@@ -163,7 +163,7 @@ function mt_handle_custom_field( $saved, $submit ) {
  * @return string
  */
 function mt_show_custom_field( $content, $event_id ) {
-	$custom_fields = apply_filters( 'mt_custom_fields', array() );
+	$custom_fields = apply_filters( 'mt_custom_fields', array(), 'display' );
 	foreach ( $custom_fields as $name => $field ) {
 		$data = mt_get_data( $name . '_' . $event_id );
 		if ( ! isset( $field['display_callback'] ) ) {
@@ -185,7 +185,7 @@ function mt_show_custom_field( $content, $event_id ) {
  * @param array $purchased
  */
 function mt_insert_custom_field( $payment_id, $post, $purchased ) {
-	$custom_fields = apply_filters( 'mt_custom_fields', array() );
+	$custom_fields = apply_filters( 'mt_custom_fields', array(), 'save' );
 	foreach ( $custom_fields as $name => $field ) {
 		if ( isset( $post[ $name ] ) ) {
 			foreach ( $post[ $name ] as $key => $data ) {
@@ -207,7 +207,7 @@ function mt_insert_custom_field( $payment_id, $post, $purchased ) {
  * @return string
  */
 function mt_show_payment_field( $content, $payment_id ) {
-	$custom_fields = apply_filters( 'mt_custom_fields', array() );
+	$custom_fields = apply_filters( 'mt_custom_fields', array(), 'admin' );
 	$output        = '';
 	foreach ( $custom_fields as $name => $field ) {
 		$data   = get_post_meta( $payment_id, $name );
@@ -241,7 +241,7 @@ function mt_show_payment_field( $content, $payment_id ) {
  * @return string
  */
 function mt_show_custom_data( $payment_id, $custom_field = false ) {
-	$custom_fields = apply_filters( 'mt_custom_fields', array() );
+	$custom_fields = apply_filters( 'mt_custom_fields', array(), 'receipt' );
 	$output        = '';
 	foreach ( $custom_fields as $name => $field ) {
 		if ( $custom_field == false || $custom_field == $name ) {

@@ -188,7 +188,7 @@ function mt_settings() {
 									/*
 									 * Add custom fields to display of template tags.
 									 */
-									$custom_fields = apply_filters( 'mt_custom_fields', array() );
+									$custom_fields = apply_filters( 'mt_custom_fields', array(), 'tags' );
 									foreach ( $custom_fields as $name => $field ) {
 										$tags[] = $name;
 									}

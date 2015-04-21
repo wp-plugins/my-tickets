@@ -274,7 +274,7 @@ function mt_send_notifications( $status = 'Completed', $details = array(), $erro
 		'method'         => ucfirst( $ticketing_method ),
 		'phone'          => $phone
 	);
-	$custom_fields = apply_filters( 'mt_custom_fields', array() );
+	$custom_fields = apply_filters( 'mt_custom_fields', array(), 'notify' );
 	foreach ( $custom_fields as $name => $field ) {
 		$data[$name] = call_user_func( $field['display_callback'], get_post_meta( $id, '_'.$name, true ) );
 	}

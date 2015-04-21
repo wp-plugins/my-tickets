@@ -68,13 +68,13 @@ None yet!
 
 = 1.0.5 =
 
-* Per-ticket handling fee
-* Shut off online ticket sales when 'x' tickets or 'x' percentage of total tickets are left.
-* Save timestamp in custom field in order to create lists of tickets by date.
-* Print This Report button
-* Only display last month of events in reports dropdown.
-* Added more filters to further ability to extend My Tickets.
-* Text change for clarity in what "total" is.
+* Feature: Add per-ticket handling fee
+* Feature: Shut off online ticket sales when 'x' tickets or 'x' percentage of total tickets are left.
+* Feature: Print This Report button (table version only)
+* Change: Save timestamp in custom field in order to create lists of tickets by date.
+* Change: Only display last month of events in reports dropdown.
+* Change: Added more filters to further ability to extend My Tickets.
+* Change: Text change for clarity in what "total" is.
 * Bug fix: re-sending email could create new tickets.
 * Bug fix: Use COOKIEPATH instead of SITECOOKIEPATH to support WP installed in a separate directory.
 

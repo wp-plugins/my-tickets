@@ -143,7 +143,7 @@ function mt_generate_report_by_event( $event_id = false, $return = false ) {
 			$total_tickets  = $data['tickets'];
 			$total_sales    = count( $data['report']['html']['Completed'] ) + count( $data['report']['html']['Pending'] );
 			$total_income   = $data['income'];
-			$custom_fields  = apply_filters( 'mt_custom_fields', array() );
+			$custom_fields  = apply_filters( 'mt_custom_fields', array(), 'reports' );
 			$custom_headers = '';
 			foreach ( $custom_fields as $name => $field ) {
 				$custom_headers .= "<th scope='col' class='mt_" . sanitize_title( $name ) . "'>" . $field['title'] . "</th>\n";
@@ -391,7 +391,7 @@ function mt_purchases( $event_id, $options = array( 'include_failed' => false ) 
 					$total_income  = $total_income + $paid;
 					$total_tickets = $total_tickets + $count;
 					$class         = esc_attr( strtolower( $status ) );
-					$custom_fields = apply_filters( 'mt_custom_fields', array() );
+					$custom_fields = apply_filters( 'mt_custom_fields', array(), 'reports' );
 					$custom_cells  = $custom_csv = '';
 					foreach ( $custom_fields as $name => $field ) {
 						$value = get_post_meta( $purchase_id, $name, true );
@@ -505,7 +505,7 @@ function mt_download_csv_event() {
 		$purchases       = mt_purchases( $event_id );
 		$report          = $purchases['report']['csv'];
 		$custom_headings = '';
-		$custom_fields   = apply_filters( 'mt_custom_fields', array() );
+		$custom_fields   = apply_filters( 'mt_custom_fields', array(), 'reports' );
 		foreach ( $custom_fields as $name => $field ) {
 			$custom_headings .= ",\"$name\"";
 		}

@@ -289,7 +289,7 @@ function mt_handling_price( $price, $event ) {
 function mt_handling_notice() {
 	$options      = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
 	if ( isset( $options['mt_ticket_handling' ] ) && is_numeric( $options['mt_ticket_handling' ] ) ) {
-		$handling_notice = apply_filters( 'mt_ticket_handling_notice', sprintf( __( 'Tickets include a %s ticket handling charge', 'my-tickets' ), apply_filters( 'mt_money_format', $options['mt_ticket_handling'] ) ) );
+		$handling_notice = "<div class='mt-ticket-handling'>" . apply_filters( 'mt_ticket_handling_notice', sprintf( __( 'Tickets include a %s ticket handling charge.', 'my-tickets' ), apply_filters( 'mt_money_format', $options['mt_ticket_handling'] ) ) ) . "</div>";
 	} else {
 		$handling_notice = '';
 	}
