@@ -234,7 +234,7 @@ function mt_tickets_remaining( $tickets_data, $event_id ) {
 		$tickets_remain_text = '';
 	} else {
 		if ( $tickets_remaining > 0 ) {
-			$tickets_remain_text = ' ' . sprintf( apply_filters( 'mt_tickets_still_remaining_text', __( 'There are still %d tickets available at the box office!', 'my-tickets' ) ), $tickets_remaining );
+			$tickets_remain_text = ' ' . sprintf( apply_filters( 'mt_tickets_still_remaining_text', __( 'Online sales are closed, but there are still %d tickets available at the box office!', 'my-tickets' ) ), $tickets_remaining );
 		} else {
 			$tickets_remain_text = '';
 		}
