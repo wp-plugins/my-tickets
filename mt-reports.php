@@ -175,11 +175,12 @@ function mt_generate_report_by_event( $event_id = false, $return = false ) {
 			}
 
 			$output .= $out . "</div>";
+			$total_line = "<p class='totals'>" . sprintf( __( '%1$s tickets sold in %3$s purchases. Total sales: %2$s', 'my-tickets' ), "<strong>$total_tickets</strong>", "<strong>" . apply_filters( 'mt_money_format', $total_income ) . "</strong>", "<strong>$total_sales</strong>" ) . "</p>";
+			$custom_line = apply_filters( 'mt_custom_total_line_event', '', $event_id );
 			if ( $return ) {
-				return "<p class='totals'>" . sprintf( __( '%1$s tickets sold in %3$s purchases. Total sales: %2$s', 'my-tickets' ), "<strong>$total_tickets</strong>", "<strong>" . apply_filters( 'mt_money_format', $total_income ) . "</strong>", "<strong>$total_sales</strong>" ) . "</p>" . $output;
+				return  $total_line . $custom_line . $output;
 			} else {
-				echo "<p class='totals'>" . sprintf( __( '%1$s tickets sold in %3$s purchases. Total sales: %2$s', 'my-tickets' ), "<strong>$total_tickets</strong>", "<strong>" . apply_filters( 'mt_money_format', $total_income ) . "</strong>", "<strong>$total_sales</strong>" ) . "</p>" . $output;
-			}
+				echo $total_line . $custom_line . $output;			}
 		}
 	} else {
 		if ( $return ) {
@@ -457,19 +458,21 @@ add_action( 'admin_init', 'mt_printable_report' );
  * View printable version of table report.
  */
 function mt_printable_report() {
-
 	if ( isset( $_GET['mt_print'] ) ) {
+		$report = apply_filters( 'mt_printable_report', false );
 		$event_id = ( isset( $_GET['event_id'] ) ) ? (int) $_GET['event_id'] : false;
-		if ( !$event_id ) {
+		if ( !$event_id && !$report ) {
 			exit;
 		}
-		if ( isset( $_GET['mt-event-report'] ) && $_GET['mt-event-report'] == 'tickets' ) {
-			$report = mt_generate_tickets_by_event( $event_id, true );
-		} else {
-			$report = mt_generate_report_by_event( $event_id, true );
+		if ( !$report ) {
+			if ( isset( $_GET['mt-event-report'] ) && $_GET['mt-event-report'] == 'tickets' ) {
+				$report = mt_generate_tickets_by_event( $event_id, true );
+			} else {
+				$report = mt_generate_report_by_event( $event_id, true );
+			}
 		}
 		$stylesheet_path = apply_filters( 'mt_printable_report_css', plugins_url( 'css/report.css', __FILE__ ) );
-		$back_url = admin_url( 'admin.php?page=mt-reports' );
+		$back_url = admin_url( apply_filters( 'mt_printable_report_back', 'admin.php?page=mt-reports' ) );
 		?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -701,8 +704,10 @@ function mt_generate_report_by_time() {
 			}
 		}
 		echo "</tbody>
-	</table>";
+		</table>";
 		printf( "<p>" . __( 'Total sales in period: %s', 'my-tickets' ) . "</p>", "<strong>" . apply_filters( 'mt_money_format', $total ) . "</strong>" );
+		$custom_line = apply_filters( 'mt_custom_total_line_time', '', $start, $end );
+		echo $custom_line;
 	} else {
 		echo "<p>" . __( 'No sales in period.', 'my-tickets' ) . "</p>";
 	}

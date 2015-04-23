@@ -62,15 +62,17 @@
             $(target + ' .mt_count').val(newval);
             $(target + ' span.count').text(newval);
             var total = 0;
+            var tCount = 0;
             $('td .count').each( function () {
                 if ( $(this).is( ':visible' ) ) {
                     var count = $(this).text();
                     var price = $(this).parent('td').siblings().children('.price').text();
                     total += parseInt(count) * parseFloat(price);
+                    tCount += parseInt(count);
                 }
             });
             var mtTotal = parseFloat(total).toFixed(2).replace('/(\d)(?=(\d{3})+\.)/g', "$1,");
-            if ( mtTotal < 0 ) {
+            if ( mtTotal < 0 || tCount <= 0 ) {
                 $( 'input[name="mt_submit"]').prop( 'disabled', true );
             } else {
                 $( 'input[name="mt_submit"]').prop( 'disabled', false );

@@ -58,6 +58,7 @@
 	<div class='payment-details'>
 		<h2><?php _e( 'Payment Details', 'my-tickets' ); ?></h2> <?php mt_payment_details(); ?>
 	</div>
+	<?php echo apply_filters( 'mt_custom_receipt', '' ); ?>
 </div>
 <a href="javascript:window.print()" class="print">Print</a>
 </body>

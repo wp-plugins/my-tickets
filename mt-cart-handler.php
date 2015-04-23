@@ -97,7 +97,7 @@ function mt_create_payment( $post ) {
 		update_user_meta( $purchaser, 'mt_phone', $phone );
 	}
 
-	$purchased = $post['mt_cart_order'];
+	$purchased = ( isset( $post['mt_cart_order'] ) ) ? $post['mt_cart_order'] : false;
 	$paid      = mt_calculate_cart_cost( $purchased );
 	if ( isset( $options['mt_handling'] ) ) {
 		$paid = $paid + $options['mt_handling'];
@@ -188,16 +188,18 @@ function mt_generate_ticket_id( $purchase_id, $type, $i, $price ) {
  */
 function mt_calculate_cart_cost( $purchased ) {
 	$total = 0;
-	foreach ( $purchased as $event_id => $tickets ) {
-		$prices = mt_get_prices( $event_id );
-		if ( $prices ) {
-			foreach ( $tickets as $type => $ticket ) {
-				if ( (int) $ticket['count'] > 0 ) {
-					$price = ( isset( $prices[ $type ] ) ) ? $prices[ $type ]['price'] : '';
-					if ( $price ) {
-						$price = mt_handling_price( $price, $event_id );
+	if ( $purchased ) {
+		foreach ( $purchased as $event_id => $tickets ) {
+			$prices = mt_get_prices( $event_id );
+			if ( $prices ) {
+				foreach ( $tickets as $type => $ticket ) {
+					if ( (int) $ticket['count'] > 0 ) {
+						$price = ( isset( $prices[ $type ] ) ) ? $prices[ $type ]['price'] : '';
+						if ( $price ) {
+							$price = mt_handling_price( $price, $event_id );
+						}
+						$total = $total + ( $price * $ticket['count'] );
 					}
-					$total = $total + ( $price * $ticket['count'] );
 				}
 			}
 		}

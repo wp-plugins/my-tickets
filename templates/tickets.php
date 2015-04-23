@@ -74,6 +74,7 @@
 					<div class='ticket_id'>
 						<?php mt_ticket_id(); ?>
 					</div>
+					<?php echo apply_filters( 'mt_custom_ticket', '', mt_receipt_id() ); ?>
 				<?php } ?>
 			</div>
 		<?php

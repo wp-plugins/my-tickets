@@ -66,6 +66,12 @@ None yet!
 * Add 'Reservation' as payment status (admin-only by default)
 * Add 'Waiting List' as payment status (admin-only by default)
 
+= 1.0.6 =
+
+* Bug fix: Prevent submitting ticket order form if there are no tickets in the form.
+* Feature: add filter to receipt template so plug-ins can add custom data to template
+* Feature: make printable report view filterable so plug-ins can add print views
+
 = 1.0.5 =
 
 * Feature: Add per-ticket handling fee
