@@ -40,7 +40,7 @@ Check out the <a href="http://docs.joedolson.com/my-tickets/">online documentati
 
 = Translations =
 
-None yet!
+Dutch
 
 == Installation ==
 
@@ -65,6 +65,11 @@ None yet!
 * Improve options when there are multiple dates available for a specific event. Multiple ticket patterns w/separate pricing & availability options, etc.? Note accessibility features?
 * Add 'Reservation' as payment status (admin-only by default)
 * Add 'Waiting List' as payment status (admin-only by default)
+
+= 1.0.7 =
+
+* Bug fix: Unassigned variable after filter.
+* Translation: Dutch
 
 = 1.0.6 =
 

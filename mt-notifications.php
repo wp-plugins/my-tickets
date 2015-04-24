@@ -278,7 +278,7 @@ function mt_send_notifications( $status = 'Completed', $details = array(), $erro
 	foreach ( $custom_fields as $name => $field ) {
 		$data[$name] = call_user_func( $field['display_callback'], get_post_meta( $id, '_'.$name, true ) );
 	}
-	apply_filters( 'mt_notifications_data', $data, $details );
+	$data = apply_filters( 'mt_notifications_data', $data, $details );
 	$email     = $details['email'];
 	$headers[] = "From: $blogname Events <" . $options['mt_from'] . ">";
 	$headers[] = "Reply-to: $options[mt_from]";
