@@ -24,8 +24,8 @@ function mt_help() {
 							</p>
 							<h4><?php _e( 'Basic Settings', 'my-tickets' ); ?></h4>
 							<ul>
-								<li><?php _e( 'Add your license key', 'my-tickets' ); ?></li>
 								<li><?php _e( 'Define what post types My Tickets should be activated on','my-tickets' ); ?></li>
+								<li><?php _e( 'Set up a new post and click "Sell Tickets on this post"', 'my-tickets' ); ?></li>
 							</ul>
 							<h4><?php _e( 'Payment Settings', 'my-tickets' ); ?></h4>
 							<ul>

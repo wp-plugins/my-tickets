@@ -84,10 +84,11 @@ function mt_format_array( $output, $type, $data, $transaction_id ) {
  *
  * @param $purchase
  * @param bool $format
+ * @param mixed integer/boolean $purchase_id
  *
  * @return string
  */
-function mt_format_purchase( $purchase, $format = false, $purchase_id ) {
+function mt_format_purchase( $purchase, $format = false, $purchase_id = false ) {
 	$output  = '';
 	$options = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
 	// format purchase

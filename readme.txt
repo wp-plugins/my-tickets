@@ -69,7 +69,9 @@ Dutch
 = 1.0.7 =
 
 * Bug fix: Unassigned variable after filter.
+* Bug fix: Don't throw errors if invalid event IDs passed to shortcode
 * Translation: Dutch
+* Removed license key string from Help page
 
 = 1.0.6 =
 
