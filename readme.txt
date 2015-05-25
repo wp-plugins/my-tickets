@@ -5,7 +5,7 @@ Tags: events, ticket sales, tickets, ticketing, registration, reservations, even
 Requires at least: 4.0
 Tested up to: 4.2.2
 License: GPLv2 or later
-Stable tag: 1.0.7
+Stable tag: 1.1.0
 
 My Tickets is an easy-to-use, flexible platform for selling event tickets.
 
@@ -80,7 +80,7 @@ Dutch, Norwegian (Bokmal)
 * Bug fix: Prevent notices on invalid events
 * Bug fix: If a user submitted two payments in a row, 2nd payment might not be recorded.
 * Bug fix: Ticket IDs were generated using purchase ID only, so multiple tickets on same purchase had same ID.
-* Bug fix: QR Code URL is incorrect if site not rendered at domain root [to do]
+* Bug fix: QR Code URL is incorrect if site not rendered at domain root
 * Minor CSS change in default cart CSS.
 * Translation: Norwegian (Bokmal)
 
@@ -162,6 +162,4 @@ This is a brand new plug-in; but I'm sure you'll have questions in time! Meanwhi
 
 == Upgrade Notice ==
 
-= 1.0.0 =
-
-1.0.5: Bug fixes & new features.
+1.1.0: Important bug fixes, minor new features, Norwegian translation.
