@@ -273,7 +273,9 @@ function mt_send_notifications( $status = 'Completed', $details = array(), $erro
 		'amount_due'     => $amount_due,
 		'handling'       => apply_filters( 'mt_money_format', $handling ),
 		'method'         => ucfirst( $ticketing_method ),
-		'phone'          => $phone
+		'phone'          => $phone,
+		'purchase_ID'    => $id,
+		'purchase_edit'  => get_edit_post_link( $id, 'email' )
 	);
 	$custom_fields = apply_filters( 'mt_custom_fields', array(), 'notify' );
 	foreach ( $custom_fields as $name => $field ) {
@@ -408,7 +410,7 @@ function mt_return_tickets( $payment_id ) {
 					update_post_meta( $event_id, '_mt_registration_options', $registration );
 					for ( $i = 0; $i < $count; $i ++ ) {
 						// delete tickets from system.
-						$ticket_id = mt_generate_ticket_id( $payment_id, $type, $i, $price );
+						$ticket_id = mt_generate_ticket_id( $payment_id, $event_id, $type, $i, $price );
 						delete_post_meta( $event_id, '_ticket', $ticket_id );
 						delete_post_meta( $event_id, '_' . $ticket_id );
 					}

@@ -50,12 +50,13 @@ function mt_cpt_email_purchaser( $id ) {
 		}
 
 		if ( isset( $_POST['mt_send_email'] ) && $_POST['mt_send_email'] != '' ) {
-			$body      = stripslashes( $_POST['mt_send_email'] );
-			$subject   = stripslashes( $_POST['mt_send_subject'] );
-			$email     = get_post_meta( $id, '_email', true );
+			$body        = stripslashes( $_POST['mt_send_email'] );
+			$subject     = stripslashes( $_POST['mt_send_subject'] );
+			$email       = get_post_meta( $id, '_email', true );
+			$opt_out_url = add_query_arg();
 			$opt_out     = PHP_EOL . PHP_EOL . "<p><small>" . sprintf( __( "Don't want to receive email from us? Follow this link: %s", 'my-tickets' ), $opt_out_url ) . "</small></p>";
-			$headers[] = "From: $blogname Events <" . $options['mt_from'] . ">";
-			$headers[] = "Reply-to: $options[mt_from]";
+			$headers[]   = "From: $blogname Events <" . $options['mt_from'] . ">";
+			$headers[]   = "Reply-to: $options[mt_from]";
 			if ( $options['mt_html_email'] == 'true' ) {
 				add_filter( 'wp_mail_content_type', create_function( '', 'return "text/html";' ) );
 				$body = wpautop( $body . $opt_out );
@@ -178,18 +179,22 @@ function mt_add_inner_box() {
 	echo '<div class="mt_post_fields">' . $format . $order . $total . '</div>';
 }
 
-
+/**
+ * Create interface for viewing payment fields that can't be edited.
+ */
 function mt_add_uneditable() {
 	global $post_id;
 	if ( isset( $_GET['post'] ) && isset( $_GET['action'] ) ) {
 		$receipt       = get_post_meta( $post_id, '_receipt', true );
+		$options  = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
+		$link    = add_query_arg( 'receipt_id', $receipt, get_permalink( $options['mt_receipt_page'] ) );
 		$purchase      = get_post_meta( $post_id, '_purchased' );
 		$discount      = get_post_meta( $post_id, '_discount', true );
 		$discount_text = ( $discount != '' ) ? sprintf( __( " @ %d&#37; member discount", 'my-tickets' ), $discount ) : '';
 
 		$tickets          = mt_setup_tickets( $purchase, $post_id );
 		$ticket_data      = "<div class='ticket-data panel'><div class='inner'><h4>" . __( 'Tickets', 'my-tickets' ) . "</h4>" . mt_format_tickets( $tickets, 'html', $post_id ) . "</div></div>";
-		$purchase_data    = "<div class='transaction-purchase panel'><div class='inner'><h4>" . __( 'Receipt ID:', 'my-tickets' ) . " <code>$receipt</code></h4>" . mt_format_purchase( $purchase, 'html', $post_id ) . "</div></div>";
+		$purchase_data    = "<div class='transaction-purchase panel'><div class='inner'><h4>" . __( 'Receipt ID:', 'my-tickets' ) . " <code><a href='$link'>$receipt</a></code></h4>" . mt_format_purchase( $purchase, 'html', $post_id ) . "</div></div>";
 		$gateway          = get_post_meta( $post_id, '_gateway', true );
 		$transaction_data = "<div class='transaction-data $gateway panel'><div class='inner'><h4>" . __( 'Paid through:', 'my-tickets' ) . " <code>$gateway</code>$discount_text</h4>" . apply_filters( 'mt_format_transaction', get_post_meta( $post_id, '_transaction_data', true ), get_post_meta( $post_id, '_gateway', true ) ) . "</div></div>";
 
@@ -201,6 +206,35 @@ function mt_add_uneditable() {
 	}
 }
 
+/**
+ * Get a list of event IDs for any given purchase.
+ *
+ * @param $purchase_id
+ *
+ * @return array
+ */
+function mt_list_events( $purchase_id ) {
+	$purchase = get_post_meta( $purchase_id, '_purchased' );
+	$events = array();
+	if ( is_array( $purchase ) ) {
+		foreach ( $purchase as $purch ) {
+			foreach ( $purch as $event => $tickets ) {
+				$events[] = $event;
+			}
+		}
+	}
+
+	return $events;
+}
+
+/**
+ * Generate tickets for a given purchase.
+ *
+ * @param $purchase
+ * @param $id
+ *
+ * @return array
+ */
 function mt_setup_tickets( $purchase, $id ) {
 	$options      = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
 	$ticket_array = array();
@@ -214,7 +248,7 @@ function mt_setup_tickets( $purchase, $id ) {
 				if ( $count >= 1 ) {
 					$price = $details['price'];
 					for ( $i = 0; $i < $count; $i ++ ) {
-						$ticket_id = mt_generate_ticket_id( $id, $type, $i, $price );
+						$ticket_id = mt_generate_ticket_id( $id, $event, $type, $i, $price );
 						// check for existing ticket data
 						$meta        = get_post_meta( $id, $ticket_id, true );
 						$ticket_meta = get_post_meta( $event, '_ticket' );

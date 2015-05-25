@@ -28,7 +28,6 @@ function mt_registration_form_post( $content ) {
 			$content = mt_registration_form( $content, $event );
 		}
 	}
-
 	return $content;
 }
 
@@ -115,9 +114,11 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 					foreach ( $pricing as $type => $settings ) {
 						if ( $type ) {
 							$price      = mt_handling_price( $settings['price'], $event );
-							$handling_notice = mt_handling_notice();
 							$price      = apply_filters( 'mt_money_format', mt_calculate_discount( $price ) );
-							$value      = ( is_array( $cart_data ) && isset( $cart_data[ $type ] ) ) ? $cart_data[ $type ] : '';
+							$ticket_handling = apply_filters( 'mt_ticket_handling_price', $options['mt_ticket_handling'], $event );
+							$handling_notice = mt_handling_notice();
+							$ticket_price_label = apply_filters( 'mt_ticket_price_label', $price, $settings['price'], $ticket_handling );
+							$value      = ( is_array( $cart_data ) && isset( $cart_data[ $type ] ) ) ? $cart_data[ $type ] : apply_filters( 'mt_cart_default_value', '' );
 							$attributes = '';
 							if ( $input_type == 'checkbox' ) {
 								if ( $value == 1 ) {
@@ -139,7 +140,7 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 								$form .= "
 								<label for='mt_tickets_$type' id='mt_tickets_label_$type'>" . esc_attr( $settings['label'] ) . "</label>
 								<input type='$input_type' name='mt_tickets[$type]' id='mt_tickets_$type' class='tickets_field' value='$value' $attributes aria-labelledby='mt_tickets_label_$type mt_tickets_data_$type'$disable />
-								<span id='mt_tickets_data_$type' class='tickets-remaining'>" . sprintf( __( '(%1$s, %2$s/%3$d remaining)', 'my-tickets' ), $price, "<span class='value'>" . $remaining . "</span>", $tickets ) . "</span><span class='mt-error-notice' aria-live='assertive'></span><br />";
+								<span id='mt_tickets_data_$type' class='tickets-remaining'>" . sprintf( __( '(%1$s, %2$s/%3$d remaining)', 'my-tickets' ), $ticket_price_label, "<span class='value'>" . $remaining . "</span>", $tickets ) . "</span><span class='mt-error-notice' aria-live='assertive'></span><br />";
 								$total_order = $total_order + $value;
 							} else {
 								$remaining = $tickets_remaining;
@@ -152,7 +153,7 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 								$form .= "
 								<label for='mt_tickets_$type' id='mt_tickets_label_$type'>" . esc_attr( $settings['label'] ) . "</label>
 								<input type='$input_type' name='mt_tickets[$type]' $attributes id='mt_tickets_$type' class='tickets_field' value='$value' aria-labelledby='mt_tickets_label_$type mt_tickets_data_$type' />
-								<span id='mt_tickets_data_$type'>$price</span><span class='mt-error-notice' aria-live='assertive'></span><br />";
+								<span id='mt_tickets_data_$type'>$ticket_price_label</span><span class='mt-error-notice' aria-live='assertive'></span><br />";
 								$total_order = $total_order + $value;
 							}
 							$has_tickets = true;
@@ -288,7 +289,7 @@ function mt_handling_price( $price, $event ) {
  */
 function mt_handling_notice() {
 	$options      = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
-	if ( isset( $options['mt_ticket_handling' ] ) && is_numeric( $options['mt_ticket_handling' ] ) ) {
+	if ( isset( $options['mt_ticket_handling' ] ) && is_numeric( $options['mt_ticket_handling' ] ) && $options['mt_ticket_handling'] > 0 ) {
 		$handling_notice = "<div class='mt-ticket-handling'>" . apply_filters( 'mt_ticket_handling_notice', sprintf( __( 'Tickets include a %s ticket handling charge.', 'my-tickets' ), apply_filters( 'mt_money_format', $options['mt_ticket_handling'] ) ) ) . "</div>";
 	} else {
 		$handling_notice = '';
@@ -304,13 +305,14 @@ function mt_handling_notice() {
  * @return string
  */
 function mt_sales_close( $event_id, $expires ) {
-	$data       = get_post_meta( $event_id, '_mc_event_data', true );
-	$expiration = $expires * 60 * 60;
-	$begin      = strtotime( $data['event_begin'] . ' ' . $data['event_time'] ) - $expiration;
-	if ( date( 'Y-m-d', $begin ) == date( 'Y-m-d', current_time( 'timestamp' ) ) ) {
-		return "<p>" . sprintf( __( 'Ticket sales close at %s today', 'my-tickets' ), "<strong>" . date_i18n( get_option( 'time_format' ), $begin ) . "</strong>" ) . "</p>";
+	$event       = get_post_meta( $event_id, '_mc_event_data', true );
+	if ( $event && is_array( $event ) ) {
+		$expiration = $expires * 60 * 60;
+		$begin      = strtotime( $event['event_begin'] . ' ' . $event['event_time'] ) - $expiration;
+		if ( date( 'Y-m-d', $begin ) == date( 'Y-m-d', current_time( 'timestamp' ) ) ) {
+			return "<p>" . sprintf( __( 'Ticket sales close at %s today', 'my-tickets' ), "<strong>" . date_i18n( get_option( 'time_format' ), $begin ) . "</strong>" ) . "</p>";
+		}
 	}
-
 	return '';
 }
 
@@ -325,12 +327,13 @@ function mt_no_postal( $event_id ) {
 	$options       = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
 	$shipping_time = $options['mt_shipping_time'];
 	$event         = get_post_meta( $event_id, '_mc_event_data', true );
-	$date          = $event['event_begin'];
-	$time          = $event['event_time'];
-	$event_date    = strtotime( $date . ' ' . $time );
-	$no_postal     = ( $event_date <= ( current_time( 'timestamp' ) + ( 60 * 60 * 24 * $shipping_time ) ) ) ? true : false;
-
-	return $no_postal;
+	if ( $event && is_array( $event ) ) {
+		$date       = $event['event_begin'];
+		$time       = $event['event_time'];
+		$event_date = strtotime( $date . ' ' . $time );
+		$no_postal  = ( $event_date <= ( current_time( 'timestamp' ) + ( 60 * 60 * 24 * $shipping_time ) ) ) ? true : false;
+		return $no_postal;
+	}
 }
 
 /**

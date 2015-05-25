@@ -41,4 +41,5 @@ include $QR_BASEDIR . "qrrscode.php";
 include $QR_BASEDIR . "qrmask.php";
 include $QR_BASEDIR . "qrencode.php";
 
+// This doesn't work if WordPress is not at the domain root.
 define( 'MT_HOME_URL', $_SERVER['SERVER_NAME'] );

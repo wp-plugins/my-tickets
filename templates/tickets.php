@@ -20,11 +20,7 @@
 			?>
 			<?php if ( mt_get_ticket_method() != 'eticket' ) { ?>
 				<div class='post-thumbnail'>
-					<?php if ( has_post_thumbnail() ) { ?>
-						<?php the_post_thumbnail(); ?>
-					<?php } else { ?>
-						<?php mt_logo(); ?>
-					<?php } ?>
+					<?php mt_logo( array(), get_the_ID() ); ?>
 				</div>
 			<?php } else { ?>
 				<div class='ticket-qrcode'>

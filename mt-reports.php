@@ -346,6 +346,7 @@ function mt_select_events() {
  * @return array
  */
 function mt_purchases( $event_id, $options = array( 'include_failed' => false ) ) {
+	if ( $event_id == 'false' ) exit;
 	$query        = get_post_meta( $event_id, '_purchase' );
 	$report       = array(
 		'html' => array( 'Completed' => array(), 'Pending' => array(), 'Refunded' => array(), 'Failed' => array() ),
@@ -368,6 +369,7 @@ function mt_purchases( $event_id, $options = array( 'include_failed' => false ) 
 					$purchaser  = get_the_title( $purchase_id );
 					$first_name = get_post_meta( $purchase_id, '_first_name', true );
 					$last_name  = get_post_meta( $purchase_id, '_last_name', true );
+					$email      = get_post_meta( $purchase_id, '_email', true );
 					if ( ! $first_name || ! $last_name ) {
 						$name       = explode( ' ', $purchaser );
 						$first_name = $name[0];
@@ -407,7 +409,7 @@ function mt_purchases( $event_id, $options = array( 'include_failed' => false ) 
 					$alternate = ( $alternate == 'alternate' ) ? 'even' : 'alternate';
 					$row       = "<tr class='$alternate'><th scope='row'>$purchaser</th><td>$type</td><td>$count</td><td>" . apply_filters( 'mt_money_format', $price ) . "</td><td>" . apply_filters( 'mt_money_format', $paid ) . "</td><td class='mt_status'><span class='mt $class'>$status</span></td><td>$datetime</td>$custom_cells</tr>";
 					// add split field to csv headers
-					$csv                         = "\"$last_name\",\"$first_name\",\"$type\",\"$count\",\"$price\",\"$paid\",\"$status\",\"$date\",\"$time\",\"$phone\",\"$street\",\"$street2\",\"$city\",\"$state\",\"$code\",\"$country\"$custom_csv" . PHP_EOL;
+					$csv                         = "\"$last_name\",\"$first_name\",\"$email\",\"$type\",\"$count\",\"$price\",\"$paid\",\"$status\",\"$date\",\"$time\",\"$phone\",\"$street\",\"$street2\",\"$city\",\"$state\",\"$code\",\"$country\"$custom_csv" . PHP_EOL;
 					$report['html'][ $status ][] = $row;
 					$report['csv'][ $status ][]  = $csv;
 				}
@@ -514,6 +516,7 @@ function mt_download_csv_event() {
 		}
 		$csv = __( 'First Name', 'my-tickets' ) . ","
 		       . __( 'Last Name', 'my-tickets' ) . ","
+		       . __( 'Email', 'my-tickets' ) . ","
 		       . __( 'Ticket Type', 'my-tickets' ) . ","
 		       . __( 'Purchased', 'my-tickets' ) . ","
 		       . __( 'Price', 'my-tickets' ) . ","
@@ -577,20 +580,20 @@ add_action( 'admin_init', 'mt_download_csv_time' );
  * Download report by sales period as CSV.
  */
 function mt_download_csv_time() {
-	$csv = '';
+	$output = '';
 	if ( isset( $_GET['format'] ) && $_GET['format'] == 'csv' && isset( $_GET['page'] ) && $_GET['page'] == 'mt-reports' && isset( $_GET['mt_start'] ) ) {
 		$report = mt_get_report_data_by_time();
-		$report = $report['csv'];
+		$csv    = $report['csv'];
 		$start  = $report['start'];
 		$end    = $report['end'];
-		foreach ( $report as $row ) {
-			$csv .= "$row";
+		foreach ( $csv as $row ) {
+			$output .= "$row";
 		}
 		$title = sanitize_title( $start . '_' . $end ) . '-' . date( 'Y-m-d' );
 		header( 'Content-Type: application/csv' );
 		header( "Content-Disposition: attachment; filename=$title.csv" );
 		header( 'Pragma: no-cache' );
-		echo $csv;
+		echo $output;
 		exit;
 	}
 }

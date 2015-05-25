@@ -74,7 +74,7 @@ function mt_featured_tickets( $atts, $content = '' ) {
 			$event_data = get_post_meta( $event, '_mc_event_data', true );
 			$post       = get_post( $event, ARRAY_A );
 			if ( is_array( $post ) && is_array( $event_data ) ) {
-				$data       = array_merge( $event_data, $post );
+				$data       = apply_filters( 'mt_ticket_template_array', array_merge( $event_data, $post ) );
 				$event_data = "<div class='mt-event-details'>" . mt_draw_template( $data, $template ) . "</div>";
 				$content .= "<div class='mt-event-item'>" . $event_data . mt_registration_form( '', $event, $view, $time, true ) . "</div>";
 			}

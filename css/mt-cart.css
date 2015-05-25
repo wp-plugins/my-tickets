@@ -33,7 +33,7 @@
 }
 
 .ticket-orders fieldset {
-    padding: 1em;
+    margin: 1em 0;
     background: rgba(255, 255, 255, .9);
 }
 

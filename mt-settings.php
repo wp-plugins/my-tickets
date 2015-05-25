@@ -183,7 +183,9 @@ function mt_settings() {
 										'amount_due',
 										'method',
 										'handling',
-										'phone'
+										'phone',
+										'purchase_ID',
+										'purchase_edit'
 									);
 									/*
 									 * Add custom fields to display of template tags.

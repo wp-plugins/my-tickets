@@ -57,6 +57,20 @@ function mt_delete_data( $data = 'cart' ) {
 }
 
 /**
+ *  Verify payment status. If a payment is completed, do not re-use that payment record.
+ *
+ * @param integer $payment
+ * @return boolean
+ */
+function mt_is_payment_completed( $payment ) {
+	$payment_status = get_post_meta( $payment, '_is_paid', true );
+	if ( $payment_status == 'Completed' ) {
+		return true;
+	}
+	return false;
+}
+
+/**
  * Generates new payment from POSTed data.
  *
  * @param array $post
@@ -67,10 +81,12 @@ function mt_create_payment( $post ) {
 	global $current_user;
 	get_currentuserinfo();
 	$purchaser = ( is_user_logged_in() ) ? $current_user->ID : 1;
-	if ( mt_get_data( 'payment' ) ) {
+	$payment = mt_get_data( 'payment' );
+	if ( $payment && !mt_is_payment_completed( $payment ) ) {
 		$purchase_id = mt_get_data( 'payment' );
 		$status      = 'draft';
 	} else {
+		mt_delete_data( 'payment' );
 		$status      = ( isset( $post['mt_gateway'] ) && $post['mt_gateway'] == 'offline' ) ? 'publish' : 'draft';
 		$date        = date( 'Y-m-d H:i:00', current_time( 'timestamp' ) );
 		$post_title  = $post['mt_fname'] . ' ' . $post['mt_lname'];
@@ -147,7 +163,7 @@ function mt_create_tickets( $purchase_id, $purchased = false ) {
 			$registration['prices'][ $type ]['sold'] = $new_sold;
 			update_post_meta( $event_id, '_mt_registration_options', $registration );
 			for ( $i = 0; $i < $count; $i ++ ) {
-				$ticket_id = mt_generate_ticket_id( $purchase_id, $type, $i, $price );
+				$ticket_id = mt_generate_ticket_id( $purchase_id, $event_id, $type, $i, $price );
 				add_post_meta( $event_id, '_ticket', $ticket_id );
 				update_post_meta( $event_id, '_' . $ticket_id, array( 'type'        => $type,
 				                                                      'price'       => $price,
@@ -168,11 +184,11 @@ function mt_create_tickets( $purchase_id, $purchased = false ) {
  *
  * @return string
  */
-function mt_generate_ticket_id( $purchase_id, $type, $i, $price ) {
+function mt_generate_ticket_id( $purchase_id, $event_id, $type, $i, $price ) {
 	// hash data
-	$hash = md5( $purchase_id . $type . $i . $price );
+	$hash = md5( $purchase_id . $type . $i . $price . $event_id );
 	// reduce to 13 chars
-	$hash = substr( $hash, 0, 12 );
+	$hash = substr( $hash, 0,12 );
 	// seed with $type substring & ticket type ID
 	$hash = substr( $type, 0, 2 ) . $hash . zeroise( $i, 4 );
 
@@ -205,4 +221,22 @@ function mt_calculate_cart_cost( $purchased ) {
 		}
 	}
 	return round( $total, 2 );
+}
+
+/**
+ * Compares price paid by customer to expected price of cart.
+ *
+ * @param $price
+ * @param $payment
+ *
+ * @return boolean False if not a match
+ */
+function mt_check_payment_amount( $price, $purchase_id ) {
+	$total_paid = get_post_meta( $purchase_id, '_total_paid', true );
+	$donation = get_post_meta( $purchase_id, '_donation', true );
+	if ( $price == $total_paid + $donation ) {
+		return true;
+	}
+
+	return false;
 }

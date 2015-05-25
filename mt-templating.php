@@ -11,7 +11,18 @@ require_once( 'includes/phpqrcode/qrlib.php' );
  *
  * @return string
  */
-function mt_get_logo( $args = array() ) {
+function mt_get_logo( $args = array(), $post_ID = false ) {
+	$options   = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
+	if ( isset( $options['mt_ticket_image'] ) && $options['mt_ticket_image'] == 'event' ) {
+		$ticket = mt_get_ticket();
+		// if event has post thumbnail, use that
+		if ( has_post_thumbnail( $ticket->ID ) ) {
+			return get_the_post_thumbnail( $ticket->ID );
+		}
+	}
+	if ( $post_ID && has_post_thumbnail( $post_ID ) ) {
+		return get_the_post_thumbnail( $post_ID );
+	}
 	$args = array_merge( array( 'alt' => 'My Tickets', 'class' => 'default', 'width' => '', 'height' => '' ), $args );
 	$atts = '';
 	foreach ( $args as $att => $value ) {
@@ -24,8 +35,8 @@ function mt_get_logo( $args = array() ) {
 	return $img;
 }
 
-function mt_logo( $args = array() ) {
-	echo mt_get_logo( $args );
+function mt_logo( $args = array(), $post_ID = false ) {
+	echo mt_get_logo( $args, $post_ID );
 }
 
 /* Template Functions for Receipts */
@@ -56,9 +67,11 @@ function mt_cart_order() {
  * @return string|void
  */
 function mt_get_receipt_id() {
-	$receipt_id = esc_attr( $_GET['receipt_id'] );
+	if ( isset( $_GET['receipt_id'] ) ) {
+		$receipt_id = esc_attr( $_GET['receipt_id'] );
 
-	return $receipt_id;
+		return $receipt_id;
+	}
 }
 
 function mt_receipt_id() {
@@ -430,7 +443,7 @@ function mt_get_verification() {
 			$text .= ' (' . __( "Ticket has been used.", 'my-tickets' ) . ')';
 		}
 
-		if ( current_user_can( 'mt-verify-ticket' ) || current_user_can( 'manage_options' ) && ! $is_used ) {
+		if ( ( current_user_can( 'mt-verify-ticket' ) || current_user_can( 'manage_options' ) ) && ! $is_used ) {
 			add_post_meta( $purchase_id, '_tickets_used', $ticket_id );
 		}
 

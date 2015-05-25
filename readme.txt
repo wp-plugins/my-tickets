@@ -3,7 +3,7 @@ Contributors: joedolson
 Donate link: http://www.joedolson.com/donate/
 Tags: events, ticket sales, tickets, ticketing, registration, reservations, event tickets, sell tickets, event registration, box office
 Requires at least: 4.0
-Tested up to: 4.2
+Tested up to: 4.2.2
 License: GPLv2 or later
 Stable tag: 1.0.7
 
@@ -40,7 +40,7 @@ Check out the <a href="http://docs.joedolson.com/my-tickets/">online documentati
 
 = Translations =
 
-Dutch
+Dutch, Norwegian (Bokmal)
 
 == Installation ==
 
@@ -65,6 +65,24 @@ Dutch
 * Improve options when there are multiple dates available for a specific event. Multiple ticket patterns w/separate pricing & availability options, etc.? Note accessibility features?
 * Add 'Reservation' as payment status (admin-only by default)
 * Add 'Waiting List' as payment status (admin-only by default)
+* Create a log to view security incidents & error conditions for payments
+
+= 1.1.0 =
+* New option: pull ticket image from event featured image instead of ticket page featured image.
+* Feature: Include email address in CSV report format
+* Security: Double-verify that the price paid by gateway matches price expected.
+* Added link to receipt in Payment record
+* New filter: customize text displayed for ticket prices.
+* New filter: add custom template tags for ticketing form output.
+* New filter: alter default number of tickets
+* New template tag: return purchase ID in notifications.
+* New template tag: return purchase edit URL in notifications.
+* Bug fix: Prevent notices on invalid events
+* Bug fix: If a user submitted two payments in a row, 2nd payment might not be recorded.
+* Bug fix: Ticket IDs were generated using purchase ID only, so multiple tickets on same purchase had same ID.
+* Bug fix: QR Code URL is incorrect if site not rendered at domain root [to do]
+* Minor CSS change in default cart CSS.
+* Translation: Norwegian (Bokmal)
 
 = 1.0.7 =
 

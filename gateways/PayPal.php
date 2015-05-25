@@ -67,7 +67,8 @@ function mt_paypal_ipn() {
 			// die conditions for PayPal
 			// if receiver email or currency are wrong, this is probably a fraudulent transaction.
 			// if no receiver email provided, that check will be skipped.
-			if ( ( $receiver && ( strtolower( $receiver_email ) != $receiver ) ) || $payment_currency != $options['mt_currency'] ) {
+			$value_match = mt_check_payment_amount( $price, $item_number );
+			if ( ( $receiver && ( strtolower( $receiver_email ) != $receiver ) ) || $payment_currency != $options['mt_currency'] || !$value_match ) {
 				wp_mail( $options['mt_to'], __( 'Payment Conditions Error', 'my-tickets' ), __( "PayPal receiver email did not match account or payment currency did not match payment on $item_number", 'my-tickets' ) );
 				wp_die( __( "Payment conditions did not match expectations", 'my-tickets' ) );
 			}
@@ -148,8 +149,9 @@ function mt_gateway_paypal( $form, $gateway, $args ) {
 		<input type='hidden' name='notify_url' value='" . mt_replace_http( add_query_arg( 'mt_paypal_ipn', 'true', esc_url( home_url() ) . '/' ) ) . "' />
 		<input type='hidden' name='return' value='" . mt_replace_http( esc_url( add_query_arg( array(
 						'response_code' => 'thanks',
-						'gateway'       => 'paypal'
-					), esc_url( get_permalink( $options['mt_purchase_page'] ) ) ) ) ) . "' />
+						'gateway'       => 'paypal',
+						'payment'       => $payment_id
+					), get_permalink( $options['mt_purchase_page'] ) ) ) ) . "' />
 		<input type='hidden' name='cancel_return' value='" . mt_replace_http( add_query_arg( 'response_code', 'cancel', esc_url( get_permalink( $options['mt_purchase_page'] ) ) ) ) . "' />";
 		/* This might be part of handling discount codes.
 		if ( $discount == true && $discount_rate > 0 ) {

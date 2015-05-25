@@ -21,6 +21,7 @@ function mt_update_ticketing_settings( $post ) {
 		$availability        = ( isset( $post['mt_tickets'] ) ) ? $post['mt_tickets'] : array();
 		$close_value         = ( isset( $post['mt_tickets_close_value'] ) ) ? $post['mt_tickets_close_value'] : '';
 		$close_type          = ( isset( $post['mt_tickets_close_type'] ) ) ? $post['mt_tickets_close_type'] : 'integer';
+		$mt_ticket_image     = ( isset( $post['mt_ticket_image'] ) ) ? $post['mt_ticket_image'] : 'ticket';
 		$pricing_array       = mt_setup_pricing( $labels, $prices, $availability );
 		$defaults['pricing'] = $pricing_array;
 		$defaults['tickets'] = $mt_total_tickets;
@@ -33,7 +34,8 @@ function mt_update_ticketing_settings( $post ) {
 			'mt_ticketing'           => $mt_ticketing,
 			'mt_shipping_time'       => $mt_shipping_time,
 			'mt_tickets_close_value' => $close_value,
-			'mt_tickets_close_type'  => $close_type
+			'mt_tickets_close_type'  => $close_type,
+			'mt_ticket_image'        => $mt_ticket_image
 		), $_POST );
 		$settings = array_merge( get_option( 'mt_settings' ), $settings );
 		update_option( 'mt_settings', $settings );
@@ -108,11 +110,20 @@ function mt_ticketing_settings() {
 					<label for='mt_tickets_close_value'>" . __( 'Tickets reserved for sale at the door', 'my-tickets' ) . "</label> <input name='mt_tickets_close_value' id='mt_tickets_close_value' type='number' size='4' value='$mt_tickets_close_value' />
 			</p>";
 								$mt_tickets_close_type = ( isset( $options['mt_tickets_close_type'] ) ) ? $options['mt_tickets_close_type'] : '';
-								$form .= "<p class='handling ticket-close-type'>
+								$form .= "<p class='close ticket-close-type'>
 					<label for='mt_tickets_close_type'>" . __( 'Reserve tickets based on', 'my-tickets' ) . "</label>
 					<select name='mt_tickets_close_type' id='mt_tickets_close_type' />
 						<option value='integer'" . selected( $mt_tickets_close_type, 'integer', false ) . ">" . __( 'Specific number of tickets', 'my-tickets' ) . "</option>
 						<option value='percent'" . selected( $mt_tickets_close_type, 'percent', false ) . ">" . __( 'Percentage of available tickets', 'my-tickets' ) . "</option>
+					</select>
+			</p>";
+								$mt_ticket_image = ( isset( $options['mt_ticket_image'] ) ) ? $options['mt_ticket_image'] : '';
+								$form .= "<p class='image ticket-image-type'>
+					<label for='mt_ticket_image'>" . __( 'Image shown on tickets', 'my-tickets' ) . "</label>
+					<select name='mt_ticket_image' id='mt_ticket_image' />
+						<option value='ticket'" . selected( $mt_ticket_image, 'ticket', false ) . ">" . __( 'Featured image on Ticket Page', 'my-tickets' ) . "</option>
+						<option value='event'" . selected( $mt_ticket_image, 'event', false ) . ">" . __( 'Featured image for Event', 'my-tickets' ) . "</option>
+						<?php echo apply_filters( 'mt_custom_ticket_image_option', '' ); ?>
 					</select>
 			</p>";
 								echo $form;
