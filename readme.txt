@@ -80,7 +80,7 @@ Dutch, Norwegian (Bokmal)
 * Bug fix: Prevent notices on invalid events
 * Bug fix: If a user submitted two payments in a row, 2nd payment might not be recorded.
 * Bug fix: Ticket IDs were generated using purchase ID only, so multiple tickets on same purchase had same ID.
-* Bug fix: QR Code URL is incorrect if site not rendered at domain root [to do]
+* Bug fix: QR Code URL is incorrect if site not rendered at domain root
 * Minor CSS change in default cart CSS.
 * Translation: Norwegian (Bokmal)
 
