@@ -13,8 +13,8 @@ require_once( 'includes/phpqrcode/qrlib.php' );
  */
 function mt_get_logo( $args = array(), $post_ID = false ) {
 	$options   = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
-	if ( isset( $options['mt_ticket_image'] ) && $options['mt_ticket_image'] == 'event' ) {
-		$ticket = mt_get_ticket();
+	$ticket = mt_get_ticket();
+	if ( isset( $options['mt_ticket_image'] ) && $options['mt_ticket_image'] == 'event' && $ticket ) {
 		// if event has post thumbnail, use that
 		if ( has_post_thumbnail( $ticket->ID ) ) {
 			return get_the_post_thumbnail( $ticket->ID );
