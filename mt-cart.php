@@ -407,7 +407,8 @@ function mt_generate_cart( $user_ID = false ) {
 				<p class='mt_submit'><input type='submit' name='mt_submit' value='" . apply_filters( 'mt_submit_button_text', __( 'Place Order', 'my-tickets' ), $current_gate ) . "' /></p>\n
 				<input type='hidden' name='my-tickets' value='true' />
 			</form>" .
-			           mt_gateways() . "
+			           mt_gateways() .
+			           mt_copy_cart() . "
 		</div>";
 		} else {
 			do_action( 'mt_cart_is_empty' );
@@ -416,6 +417,16 @@ function mt_generate_cart( $user_ID = false ) {
 	}
 
 	return $breadcrumbs . $output;
+}
+
+function mt_copy_cart() {
+	if ( current_user_can( 'mt-copy-cart' ) || current_user_can( 'manage_options' ) ) {
+		$unique_id = ( isset( $_COOKIE['mt_unique_id'] ) ) ? $_COOKIE['mt_unique_id'] : false;
+		if ( $unique_id ) {
+			$cart = esc_attr( $unique_id );
+			return "<p><a href='" . admin_url( "post-new.php?post_type=mt-payments&amp;cart=$cart" ) . "'>" . __( 'Create new admin payment with this cart', 'my-tickets' ) . "</a></p>";
+		}
+	}
 }
 
 add_filter( 'mt_submit_button_text', 'mt_submit_button_text', 10, 2 );

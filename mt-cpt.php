@@ -9,30 +9,50 @@ add_action( 'add_meta_boxes', 'mt_add_meta_boxes' );
 function mt_add_meta_boxes() {
 	add_meta_box( 'mt_purchase_options', __( 'Purchase Options', 'my-tickets' ), 'mt_add_inner_box', 'mt-payments', 'normal', 'high' );
 	add_meta_box( 'mt_purchase_info', __( 'Purchase Information', 'my-tickets' ), 'mt_add_uneditable', 'mt-payments', 'side', 'high' );
-	add_meta_box( 'mt_send_email', __( 'Contact Purchaser', 'my-tickets' ), 'mt_email_purchaser', 'mt-payments', 'normal', 'default' );
+	if ( isset( $_GET['post'] ) && isset( $_GET['action'] ) ) {
+		global $post_id;
+		add_meta_box( 'mt_send_email', __( 'Contact Purchaser', 'my-tickets' ), 'mt_email_purchaser', 'mt-payments', 'normal', 'default' );
+		if ( get_post_meta( $post_id, '_error_log', true ) != '' && current_user_can( 'manage_options' ) ) {
+			add_meta_box( 'mt_error_log', __( 'Error Data', 'my-tickets' ), 'mt_error_data', 'mt-payments', 'normal', 'default' );
+		}
+	}
 }
+
+
+function mt_error_data() {
+	global $post_id;
+	echo "<pre>";
+	print_r( get_post_meta( $post_id, '_error_log' ) );
+	echo "</pre>";
+}
+
 
 function mt_email_purchaser() {
 	global $post_id;
 	$messages = false;
-	if ( isset( $_GET['post'] ) && isset( $_GET['action'] ) ) {
-		$nonce   = '<input type="hidden" name="mt-email-nonce" value="' . wp_create_nonce( 'mt-email-nonce' ) . '" />';
-		$form    = "<p><label for='mt_send_subject'>" . __( 'Subject', 'my-tickets' ) . "</label><br /><input type='text' size='60' name='mt_send_subject' id='mt_send_subject' /></p>
-		<p><label for='mt_send_email'>" . __( 'Message', 'my-tickets' ) . "</label><br /><textarea cols='60' rows='6' name='mt_send_email' id='mt_send_email'></textarea></p>
-		<input type='submit' class='button-primary' id='mt_email_form' value='" . __( 'Email Purchaser', 'my-tickets' ) . "' />";
-		$email   = get_post_meta( $post_id, '_mt_send_email' );
-		$message = "<h4>" . __( 'Prior Messages', 'my-tickets' ) . "</h4>";
-		foreach ( $email as $mail ) {
-			if ( is_array( $mail ) ) {
-				$body    = $mail['body'];
-				$subject = $mail['subject'];
-				$date    = date_i18n( get_option( 'date_format' ) . ' @ ' . get_option( 'time_format' ), $mail['date'] );
-				$message .= "<li><strong>$subject</strong> ($date)<br /><blockquote>" . stripslashes( esc_html( $body ) ) . "</blockquote>";
-				$messages = true;
-			}
+	$nonce   = '<input type="hidden" name="mt-email-nonce" value="' . wp_create_nonce( 'mt-email-nonce' ) . '" />';
+	$form    = "<p><label for='mt_send_subject'>" . __( 'Subject', 'my-tickets' ) . "</label><br /><input type='text' size='60' name='mt_send_subject' id='mt_send_subject' /></p>
+	<p><label for='mt_send_email'>" . __( 'Message', 'my-tickets' ) . "</label><br /><textarea cols='60' rows='6' name='mt_send_email' id='mt_send_email'></textarea></p>
+	<input type='submit' class='button-primary' id='mt_email_form' value='" . __( 'Email Purchaser', 'my-tickets' ) . "' />";
+	$email   = get_post_meta( $post_id, '_mt_send_email' );
+	$message = "<h4>" . __( 'Prior Messages', 'my-tickets' ) . "</h4>";
+	foreach ( $email as $mail ) {
+		if ( is_array( $mail ) ) {
+			$body    = $mail['body'];
+			$subject = $mail['subject'];
+			$date    = date_i18n( get_option( 'date_format' ) . ' @ ' . get_option( 'time_format' ), $mail['date'] );
+			$message .= "<li><strong>$subject</strong> ($date)<br /><blockquote>" . stripslashes( esc_html( $body ) ) . "</blockquote>";
+			$messages = true;
 		}
-		$prior = ( $messages ) ? "<ul>".$message."</ul>" : '';
-		echo '<div class="mt_post_fields panels">' . $nonce . $form . $prior . '</div>';
+	}
+	$prior = ( $messages ) ? "<ul>".$message."</ul>" : '';
+	echo '<div class="mt_post_fields panels">' . $nonce . $form . $prior . '</div>';
+}
+
+add_action( 'save_post', 'mt_delete_error_log', 10 );
+function mt_delete_error_log( $id ) {
+	if ( isset( $_POST['mt_delete_log'] ) ) {
+		mt_delete_log( $id );
 	}
 }
 
@@ -99,6 +119,12 @@ function mt_default_fields() {
 						'postal'    => __( 'Postal Mail', 'my-tickets' ),
 						'willcall'  => __( 'Pick up at box office', 'my-tickets' )
 					) )
+			),
+			'is_delivered'           => array(
+				'label'   => __( 'Ticket Delivered', 'my-tickets' ),
+				'input'   => 'checkbox',
+				'default' => '',
+				'notes'   => __( 'E-tickets and printable tickets are delivered via email.', 'my-tickets' )
 			),
 			'mt_return_tickets' => array(
 				'label'   => __( 'Return tickets to purchase pool', 'my-tickets' ),
@@ -384,9 +410,10 @@ function mt_create_field( $key, $label, $type, $post_id, $choices = false, $mult
 				if ( $key == 'mt_return_tickets' && get_post_meta( $post_id, '_returned', true ) == 'true' ) {
 					$notes = __( 'Tickets from this purchase have been returned to the purchase pool', 'my-tickets' );
 				}
+				$checked = checked( $custom, 'true', false );
 				$value = '
 				<div>
-					<input type="checkbox" name="_' . $key . '" id="_' . $key . '" aria-labelledby="_' . $key . ' _' . $key . '_notes" value="true" /> <label for="_' . $key . '">' . $label . '</label><br />
+					<input type="checkbox" name="_' . $key . '" id="_' . $key . '" aria-labelledby="_' . $key . ' _' . $key . '_notes" value="true" ' . $checked . ' /> <label for="_' . $key . '">' . $label . '</label><br />
 					<span id="_' . $key . '_notes">' . $notes . '</span>
 				</div>';
 			}

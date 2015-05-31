@@ -65,5 +65,20 @@ function mt_handle_payment( $response, $response_code, $data, $post ) {
 		$mail_Body .= print_r( $data, 1 );
 		$mail_Body .= print_r( $post, 1 );
 		wp_mail( $options['mt_to'], $mail_Subject, $mail_Body, $mail_From );
+		mt_log( $response, $response_code, $data, $post );
 	}
+}
+
+function mt_log( $response, $response_code, $data, $post ) {
+	// log errors
+	// if there is no purchase ID, then there's nowhere to log this data.
+	$purchase_id = ( isset( $data['purchase_id'] ) ) ? $data['purchase_id'] : false;
+	if ( $purchase_id ) {
+		// could have more than one error.
+		add_post_meta( $purchase_id, '_error_log', array( $response, $response_code, $data, $post ) );
+	}
+}
+
+function mt_delete_log( $purchase_id ) {
+	delete_post_meta( $purchase_id, '_error_log' );
 }

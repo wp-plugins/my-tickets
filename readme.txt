@@ -65,7 +65,16 @@ Dutch, Norwegian (Bokmal)
 * Improve options when there are multiple dates available for a specific event. Multiple ticket patterns w/separate pricing & availability options, etc.? Note accessibility features?
 * Add 'Reservation' as payment status (admin-only by default)
 * Add 'Waiting List' as payment status (admin-only by default)
-* Create a log to view security incidents & error conditions for payments
+
+= 1.1.1 =
+
+* Bug fix: Reports list limited to 10 events.
+* Modify reports to include notes field & payment ID.
+* Modify reports to remove payment status, since status reports are displayed based on status.
+* Added delivery checkbox to Payment to indicate whether tickets on that payment have been delivered.
+* Added option to copy front-end cart into admin payment when logged-in as user with appropriate permissions.
+* Added ability to view processing errors on payments
+
 
 = 1.1.0 =
 * New option: pull ticket image from event featured image instead of ticket page featured image.

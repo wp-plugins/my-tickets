@@ -152,12 +152,14 @@ function mt_generate_report_by_event( $event_id = false, $return = false ) {
 						<thead>
 							<tr>
 								<th scope='col'>" . __( 'Purchaser', 'my-tickets' ) . "</th>
+								<th scope='col'>" . __( 'Notes', 'my-tickets' ) . "</th>
 								<th scope='col'>" . __( 'Type', 'my-tickets' ) . "</th>
 								<th scope='col'>" . __( 'Tickets', 'my-tickets' ) . "</th>
 								<th scope='col'>" . __( 'Price', 'my-tickets' ) . "</th>
 								<th scope='col'>" . __( 'Paid', 'my-tickets' ) . "</th>
-								<th scope='col' id='mt_status' class='mt_status'>" . __( 'Status', 'my-tickets' ) . "</th>
+								<th scope='col' id='mt_method' class='mt_method'>" . __( 'Ticket Method', 'my-tickets' ) . "</th>
 								<th scope='col'>" . __( 'Date', 'my-tickets' ) . "</th>
+								<th scope='col'>" . __( 'ID', 'my-tickets' ) . "</th>
 								$custom_headers
 							</tr>
 						</thead>
@@ -306,9 +308,11 @@ function mt_select_events() {
 	// fetch posts with meta data for event sales
 	$settings = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
 	// add time query to this query after timestamp field has been in place for a few months.
+	// only show limit of 50 events.
 	$args    =
 		array(
 			'post_type'   => $settings['mt_post_types'],
+			'posts_per_page'  => apply_filters( 'mt_select_events_count', 50 ),
 			'post_status' => array( 'publish', 'draft' ),
 			'meta_query'  => array(
 				'relation' => 'AND',
@@ -359,7 +363,9 @@ function mt_purchases( $event_id, $options = array( 'include_failed' => false ) 
 			if ( get_post_status( $purchase_id ) != 'publish' ) {
 				continue;
 			}
-			$status = get_post_meta( $purchase_id, '_is_paid', true );
+			$status      = get_post_meta( $purchase_id, '_is_paid', true );
+			$ticket_type = get_post_meta( $purchase_id, '_ticketing_method', true );
+			$notes       = esc_html( get_post_meta( $purchase_id, '_notes', true ) );
 			if ( $options['include_failed'] == false && ( $status == 'Failed' || $status == 'Refunded' ) ) {
 				continue;
 			}
@@ -393,7 +399,7 @@ function mt_purchases( $event_id, $options = array( 'include_failed' => false ) 
 					$paid          = ( $status == 'Completed' ) ? $subtotal : 0;
 					$total_income  = $total_income + $paid;
 					$total_tickets = $total_tickets + $count;
-					$class         = esc_attr( strtolower( $status ) );
+					$class         = esc_attr( strtolower( $ticket_type ) );
 					$custom_fields = apply_filters( 'mt_custom_fields', array(), 'reports' );
 					$custom_cells  = $custom_csv = '';
 					foreach ( $custom_fields as $name => $field ) {
@@ -407,9 +413,9 @@ function mt_purchases( $event_id, $options = array( 'include_failed' => false ) 
 						$custom_csv .= ",\"$value\"";
 					}
 					$alternate = ( $alternate == 'alternate' ) ? 'even' : 'alternate';
-					$row       = "<tr class='$alternate'><th scope='row'>$purchaser</th><td>$type</td><td>$count</td><td>" . apply_filters( 'mt_money_format', $price ) . "</td><td>" . apply_filters( 'mt_money_format', $paid ) . "</td><td class='mt_status'><span class='mt $class'>$status</span></td><td>$datetime</td>$custom_cells</tr>";
+					$row       = "<tr class='$alternate'><th scope='row'>$purchaser</th><td>$notes</td><td>$type</td><td>$count</td><td>" . apply_filters( 'mt_money_format', $price ) . "</td><td>" . apply_filters( 'mt_money_format', $paid ) . "</td><td class='mt_ticket_type'><span class='mt $class'>$ticket_type</span></td><td>$datetime</td><td>$purchase_id</td>$custom_cells</tr>";
 					// add split field to csv headers
-					$csv                         = "\"$last_name\",\"$first_name\",\"$email\",\"$type\",\"$count\",\"$price\",\"$paid\",\"$status\",\"$date\",\"$time\",\"$phone\",\"$street\",\"$street2\",\"$city\",\"$state\",\"$code\",\"$country\"$custom_csv" . PHP_EOL;
+					$csv                         = "\"$last_name\",\"$first_name\",\"$email\",\"$type\",\"$count\",\"$price\",\"$paid\",\"$ticket_type\",\"$date\",\"$time\",\"$phone\",\"$street\",\"$street2\",\"$city\",\"$state\",\"$code\",\"$country\"$custom_csv" . PHP_EOL;
 					$report['html'][ $status ][] = $row;
 					$report['csv'][ $status ][]  = $csv;
 				}
@@ -521,7 +527,7 @@ function mt_download_csv_event() {
 		       . __( 'Purchased', 'my-tickets' ) . ","
 		       . __( 'Price', 'my-tickets' ) . ","
 		       . __( 'Paid', 'my-tickets' ) . ","
-		       . __( 'Payment Status', 'my-tickets' ) . ","
+		       . __( 'Ticket Method', 'my-tickets' ) . ","
 		       . __( 'Date', 'my-tickets' ) . ","
 		       . __( 'Time', 'my-tickets' ) . ","
 		       . __( 'Phone', 'my-tickets' ) . ","
