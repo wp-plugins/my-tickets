@@ -120,7 +120,7 @@ function mt_default_fields() {
 						'willcall'  => __( 'Pick up at box office', 'my-tickets' )
 					) )
 			),
-			'is_delivered'           => array(
+			'is_delivered'         => array(
 				'label'   => __( 'Ticket Delivered', 'my-tickets' ),
 				'input'   => 'checkbox',
 				'default' => '',
@@ -393,7 +393,7 @@ function mt_create_field( $key, $label, $type, $post_id, $choices = false, $mult
 				$value = "
 				<div>
 					<label for='_$key'>$label</label><br />
-					<input style='width: 100%;' type='text' name='_$key' id='$key' value='$custom' $disabled />
+					<input class='widefat' type='text' name='_$key' id='$key' value='$custom' $disabled />
 				</div>";
 			}
 			break;
@@ -401,7 +401,7 @@ function mt_create_field( $key, $label, $type, $post_id, $choices = false, $mult
 			$value = '
 			<div>
 				<label for="_' . $key . '">' . $label . ' <em>(' . $notes . ')</em></label><br />' .
-			         '<textarea style="width: 100%;" cols="60" rows="4" name="_' . $key . '" id="_' . $key . '">' . $custom . '</textarea>
+			         '<textarea class="widefat" cols="60" rows="4" name="_' . $key . '" id="_' . $key . '">' . $custom . '</textarea>
 			</div>';
 			break;
 		case 'checkbox':

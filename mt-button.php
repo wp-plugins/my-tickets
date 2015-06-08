@@ -111,9 +111,13 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 				if ( $tickets_remaining && $tickets_remaining > apply_filters( 'mt_tickets_close_value', 0, $event_id, $tickets_data ) ) {
 					$sold_out    = false;
 					$total_order = 0;
+					$comps = ( current_user_can( 'manage_options' ) ) ? true : false;
 					foreach ( $pricing as $type => $settings ) {
+						if ( $type == 'complementary' && $comps == false ) {
+							continue;
+						}
 						if ( $type ) {
-							$price      = mt_handling_price( $settings['price'], $event );
+							$price      = mt_handling_price( $settings['price'], $event, $type );
 							$price      = apply_filters( 'mt_money_format', mt_calculate_discount( $price ) );
 							$ticket_handling = apply_filters( 'mt_ticket_handling_price', $options['mt_ticket_handling'], $event );
 							$handling_notice = mt_handling_notice();
@@ -274,7 +278,10 @@ function mt_close_ticket_sales( $limit, $event_id, $remaining ) {
  *
  * @return new price
  */
-function mt_handling_price( $price, $event ) {
+function mt_handling_price( $price, $event, $type ) {
+	if ( $type == 'complementary' ) {
+		return $price; // no handling on complementary tickets.
+	}
 	$options      = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
 	if ( isset( $options['mt_ticket_handling' ] ) && is_numeric( $options['mt_ticket_handling' ] ) ) {
 		$price  = $price + apply_filters( 'mt_ticket_handling_price', $options['mt_ticket_handling'], $event );

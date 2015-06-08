@@ -269,6 +269,21 @@ function mt_prices_table( $registration = array() ) {
 				</tr>";
 			}
 		}
+		$has_comps = false;
+		$keys = array_keys( $pricing );
+		if ( in_array( 'complementary', $keys ) ) {
+			$has_comps = true;
+		}
+		if ( !$has_comps ) {
+			$return .= "
+				<tr>
+					<td class='controls'><button href='#' class='button up'><span class='dashicons dashicons-arrow-up-alt'></span><span class='screen-reader-text'>Move Up</span></button> <button href='#' class='button down'><span class='dashicons dashicons-arrow-down-alt'></span><span class='screen-reader-text'>Move Down</span></button></td>
+					<td><input type='text' readonly name='mt_label[]' id='mt_label_complementary' value='Complementary' /><br />" . __( 'Note: complementary tickets can only be added by logged-in administrators.', 'my-tickets' ) . "</td>
+					<td><input type='text' readonly name='mt_price[]' id='mt_price_complementary' value='0' size='8' /></td>
+					<td>$available</td>
+					<td></td>
+				</tr>";
+		}
 	}
 	$return .= "
 		<tr class='clonedPrice' id='price1'>

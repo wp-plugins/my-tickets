@@ -288,7 +288,7 @@ function mt_ticket_type() {
 }
 
 /**
- * Get price paid for ticket.
+ * Get ticket price for ticket.
  *
  * @return string
  */

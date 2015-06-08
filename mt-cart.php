@@ -514,9 +514,13 @@ function mt_generate_cart_table( $cart, $format = 'cart' ) {
 				$datetime     = "<span class='mt-datetime'>" . date_i18n( get_option( 'date_format' ) . ' @ ' . get_option( 'time_format' ), strtotime( $date ) ) . "</span>";
 				if ( is_array( $order ) ) {
 					foreach ( $order as $type => $count ) {
+						$comps = ( current_user_can( 'manage_options' ) ) ? true : false;
+						if ( $type == 'complementary' && $comps == false ) {
+							continue;
+						}
 						if ( $count > 0 ) {
 							if ( isset( $prices[ $type ] ) ) {
-								$price = mt_handling_price( $prices[ $type ]['price'], $event_id );
+								$price = mt_handling_price( $prices[ $type ]['price'], $event_id, $type );
 								$label = $prices[ $type ]['label'];
 								if ( $format == 'cart' || is_admin() ) {
 									$hidden = "
