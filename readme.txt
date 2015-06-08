@@ -74,7 +74,7 @@ Dutch, Norwegian (Bokmal)
 * Added delivery checkbox to Payment to indicate whether tickets on that payment have been delivered.
 * Added option to copy front-end cart into admin payment when logged-in as user with appropriate permissions.
 * Added ability to view processing errors on payments
-
+* Added ability to add complementary tickets through admin.
 
 = 1.1.0 =
 * New option: pull ticket image from event featured image instead of ticket page featured image.
