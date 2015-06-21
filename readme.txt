@@ -68,13 +68,21 @@ Dutch, Norwegian (Bokmal)
 
 = 1.1.1 =
 
-* Bug fix: Reports list limited to 10 events.
 * Modify reports to include notes field & payment ID.
+* Modify default report view to only show maximum of most recent 50 payments.
 * Modify reports to remove payment status, since status reports are displayed based on status.
 * Added delivery checkbox to Payment to indicate whether tickets on that payment have been delivered.
 * Added option to copy front-end cart into admin payment when logged-in as user with appropriate permissions.
 * Added ability to view processing errors on payments
 * Added ability to add complementary tickets through admin.
+* Added template tag for ticket_ids
+* Added function to get purchaser name for ticket templates.
+* Added date to title output in default template for [tickets] shortcode.
+* Added view of [ticket] shortcode after editing event details in registration form panel.
+* Improved handling of Paypal IPN errors.
+* Bug fix: Some broken currency symbols.
+* Bug fix: Reports list was limited to 10 events.
+* Translation: Polish
 
 = 1.1.0 =
 * New option: pull ticket image from event featured image instead of ticket page featured image.
@@ -159,9 +167,9 @@ Dutch, Norwegian (Bokmal)
 
 == Frequently Asked Questions ==
 
-= Hey! Why don't you have any Frequently Asked Questions here! =
+= I'm trying to sell tickets with My Calendar, but can't see how to add sales information =
 
-This is a brand new plug-in; but I'm sure you'll have questions in time! Meanwhile, check out the [documentation](http://docs.joedolson.com/my-tickets/].
+The My Tickets sales information is entered in the 'Registration Information' panel of the My Calendar add event screen. This may be turned off in your installation. There are two places to look to enable it. First, go to My Calendar > Settings and go to the Input Settings section. If the 'registration' option isn't checked, check it and save settings. Second, go to the Add Event screen. If the registration options still aren't visible, you may need to enable them in your personal Screen Options. Open the Screen Options panel and check the option there - these are settings that apply only to your account.
 
 == Screenshots ==
 

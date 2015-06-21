@@ -73,6 +73,9 @@ function mt_format_array( $output, $type, $data, $transaction_id ) {
 			case 'tickets' :
 				$output = mt_format_tickets( $data, 'text', $transaction_id  );
 				break;
+			case 'ticket_ids' :
+				$output = mt_format_tickets( $data, 'ids', $transaction_id  );
+				break;
 		}
 	}
 
@@ -181,8 +184,12 @@ function mt_format_tickets( $tickets, $type = 'text', $purchase_id ) {
 	$total   = count( $tickets );
 	$i       = 1;
 	foreach ( $tickets as $ticket ) {
-		$ticket = ( $is_html ) ? "<a href='$ticket' target='_blank'>" . __( 'View Ticket', 'my-tickets' ) . " ($i/$total)</a>" : $ticket;
-		$output .= "$i/$total: " . $ticket . $sep;
+		if ( $type == 'ids' ) {
+			$output .= "$i/$total: $ticket" . $sep;
+		} else {
+			$ticket = ( $is_html ) ? "<a href='$ticket' target='_blank'>" . __( 'View Ticket', 'my-tickets' ) . " ($i/$total)</a>" : $ticket;
+			$output .= "$i/$total: " . $ticket . $sep;
+		}
 		$i ++;
 	}
 
@@ -254,14 +261,17 @@ function mt_send_notifications( $status = 'Completed', $details = array(), $erro
 	$address          = ( isset( $transaction_data['shipping'] ) ) ? $transaction_data['shipping'] : false;
 	$ticketing_method = get_post_meta( $id, '_ticketing_method', true );
 	if ( $ticketing_method == 'eticket' || $ticketing_method == 'printable' ) {
-		$tickets = apply_filters( 'mt_format_array', '', 'tickets', $ticket_array, $transaction_id );
+		$tickets    = apply_filters( 'mt_format_array', '', 'tickets', $ticket_array, $transaction_id );
+		$ticket_ids = apply_filters( 'mt_format_array', '', 'ticket_ids', $ticket_array, $transaction_id );
 	} else {
-		$tickets = ( $ticketing_method == 'willcall' ) ? __( 'Your tickets will be available at the box office.', 'my-tickets' ) : __( 'Your tickets will be mailed to you at the address provided.', 'my-tickets' );
-		$tickets = ( $options['mt_html_email'] == 'true' ) ? "<p>" . $tickets . "</p>" : $tickets;
+		$tickets    = ( $ticketing_method == 'willcall' ) ? __( 'Your tickets will be available at the box office.', 'my-tickets' ) : __( 'Your tickets will be mailed to you at the address provided.', 'my-tickets' );
+		$tickets    = ( $options['mt_html_email'] == 'true' ) ? "<p>" . $tickets . "</p>" : $tickets;
+		$ticket_ids = '';
 	}
 	$data = array(
 		'receipt'        => apply_filters( 'mt_format_receipt', $receipt ),
 		'tickets'        => $tickets,
+		'ticket_ids'     => $ticket_ids,
 		'name'           => $details['name'],
 		'blogname'       => $blogname,
 		'total'          => $total,

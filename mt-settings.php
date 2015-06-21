@@ -172,6 +172,7 @@ function mt_settings() {
 									$tags      = array(
 										'receipt',
 										'tickets',
+										'ticket_ids',
 										'name',
 										'blogname',
 										'total',

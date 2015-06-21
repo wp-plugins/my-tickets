@@ -37,6 +37,9 @@ function mt_paypal_ipn() {
 			$parent           = isset( $_POST['parent_txn_id'] ) ? $_POST['parent_txn_id'] : '';
 			// paypal IPN data
 			$ipn           = wp_remote_post( $url, $params );
+			if ( is_wp_error( $ipn ) ) {
+				status_header( 503 ); die;
+			}
 			$response      = $ipn['body'];
 			$response_code = $ipn['response']['code'];
 
@@ -75,6 +78,42 @@ function mt_paypal_ipn() {
 			mt_handle_payment( $response, $response_code, $data, $_POST );
 			// Everything's all right.
 			status_header( 200 );
+		} else {
+			/*
+			 * Array = example of opened dispute
+(
+    [txn_type] => new_case
+    [payment_date] => 11:59:14 Jun 19, 2015 PDT
+    [case_id] => PP-003-993-944-262
+    [case_type] => dispute
+    [business] => boxoffice@montrealfringe.ca
+    [verify_sign] => An5ns1Kso7MWUdW4ErQKJJJ4qi4-A4tHEcyDxWV.AQWV7GppbFfDzoUu
+    [payer_email] => florist@bulgariaflowers.com
+    [txn_id] => 81N30687U6469013P ---- ADD SEARCH BY TXN ID (Can already do search by TXN ID using WP default search in Payments. Awesome!)
+    [case_creation_date] => 14:14:42 Jun 19, 2015 PDT
+    [receiver_email] => boxoffice@montrealfringe.ca
+    [buyer_additional_information] => I never received the tickets and the event is now passed. I demand a full refund.
+    [payer_id] => 9U9K7PUR4N9MN
+    [receiver_id] => 7Y85C9XYUFTAL
+    [reason_code] => non_receipt
+    [custom] =>
+    [charset] => windows-1252
+    [notify_version] => 3.8
+    [ipn_track_id] => ec5afdb15a0ed
+)
+			 */
+			if ( isset( $_POST['txn_type'] ) ) {
+				// this is a transaction other than a purchase.
+				if ( $_POST['txn_type'] == 'new_case' && $_POST['case_type'] == 'dispute' ) {
+					// a purchaser has opened a dispute on this purchase.
+					// get payment based on $_POST['txn_id']
+					// set new post meta field _extended_transaction
+					// add set of notes to display for extended transactions.
+
+				}
+				status_header( 200 );
+			}
+			status_header( 503 ); die;
 		}
 	}
 

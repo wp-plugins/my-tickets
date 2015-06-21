@@ -702,14 +702,16 @@ function mt_expired( $event ) {
 	} else {
 		$options    = get_post_meta( $event, '_mt_registration_options', true );
 		$data       = get_post_meta( $event, '_mc_event_data', true );
-		$expires    = ( isset( $options['reg_expires'] ) ) ? $options['reg_expires'] : 0;
-		$expiration = $expires * 60 * 60;
-		$begin      = strtotime( $data['event_begin'] . ' ' . $data['event_time'] ) - $expiration;
-		if ( mt_date_comp( date( 'Y-m-d H:i:s', $begin ), date( 'Y-m-d H:i:s', current_time( 'timestamp' ) ) ) ) {
-			update_post_meta( $event, '_mt_event_expired', 'true' );
-			do_action( 'mt_ticket_sales_closed', $event );
+		if ( is_array( $data ) && is_array( $options ) && !empty( $options ) ) {
+			$expires    = ( isset( $options['reg_expires'] ) ) ? $options['reg_expires'] : 0;
+			$expiration = $expires * 60 * 60;
+			$begin      = strtotime( $data['event_begin'] . ' ' . $data['event_time'] ) - $expiration;
+			if ( mt_date_comp( date( 'Y-m-d H:i:s', $begin ), date( 'Y-m-d H:i:s', current_time( 'timestamp' ) ) ) ) {
+				update_post_meta( $event, '_mt_event_expired', 'true' );
+				do_action( 'mt_ticket_sales_closed', $event );
 
-			return true;
+				return true;
+			}
 		}
 
 		return false;

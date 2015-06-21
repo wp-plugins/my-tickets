@@ -613,6 +613,11 @@ function mt_download_csv_time() {
  * @return array
  */
 function mt_get_report_by_time( $start, $end ) {
+	$posts_per_page = -1;
+	if ( $start == date( 'Y-m-d', strtotime( apply_filters( 'mt_default_report_start_date', '-1 week' ) ) ) && $end == date( 'Y-m-d' ) ) {
+		$posts_per_page = 50;
+	}
+
 	$args  =
 		array(
 			'post_type'      => 'mt-payments',
@@ -622,7 +627,7 @@ function mt_get_report_by_time( $start, $end ) {
 				'before'    => $end,
 				'inclusive' => true
 			),
-			'posts_per_page' => - 1
+			'posts_per_page' => $posts_per_page
 		);
 	$query = new WP_Query( $args );
 	$posts = $query->posts;

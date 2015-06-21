@@ -278,7 +278,7 @@ function mt_close_ticket_sales( $limit, $event_id, $remaining ) {
  *
  * @return new price
  */
-function mt_handling_price( $price, $event, $type ) {
+function mt_handling_price( $price, $event, $type = 'standard' ) {
 	if ( $type == 'complementary' ) {
 		return $price; // no handling on complementary tickets.
 	}
@@ -314,10 +314,12 @@ function mt_handling_notice() {
 function mt_sales_close( $event_id, $expires ) {
 	$event       = get_post_meta( $event_id, '_mc_event_data', true );
 	if ( $event && is_array( $event ) ) {
-		$expiration = $expires * 60 * 60;
-		$begin      = strtotime( $event['event_begin'] . ' ' . $event['event_time'] ) - $expiration;
-		if ( date( 'Y-m-d', $begin ) == date( 'Y-m-d', current_time( 'timestamp' ) ) ) {
-			return "<p>" . sprintf( __( 'Ticket sales close at %s today', 'my-tickets' ), "<strong>" . date_i18n( get_option( 'time_format' ), $begin ) . "</strong>" ) . "</p>";
+		if ( isset( $event['event_begin'] ) && isset( $event['event_time'] ) ) {
+			$expiration = $expires * 60 * 60;
+			$begin      = strtotime( $event['event_begin'] . ' ' . $event['event_time'] ) - $expiration;
+			if ( date( 'Y-m-d', $begin ) == date( 'Y-m-d', current_time( 'timestamp' ) ) ) {
+				return "<p>" . sprintf( __( 'Ticket sales close at %s today', 'my-tickets' ), "<strong>" . date_i18n( get_option( 'time_format' ), $begin ) . "</strong>" ) . "</p>";
+			}
 		}
 	}
 	return '';
@@ -335,12 +337,17 @@ function mt_no_postal( $event_id ) {
 	$shipping_time = $options['mt_shipping_time'];
 	$event         = get_post_meta( $event_id, '_mc_event_data', true );
 	if ( $event && is_array( $event ) ) {
-		$date       = $event['event_begin'];
-		$time       = $event['event_time'];
-		$event_date = strtotime( $date . ' ' . $time );
-		$no_postal  = ( $event_date <= ( current_time( 'timestamp' ) + ( 60 * 60 * 24 * $shipping_time ) ) ) ? true : false;
-		return $no_postal;
+		$date       = ( isset( $event['event_begin'] ) ) ? $event['event_begin']: false;
+		$time       =  ( isset( $event['event_time'] ) ) ? $event['event_time']: false;
+		if ( $date && $time ) {
+			$event_date = strtotime( $date . ' ' . $time );
+			$no_postal  = ( $event_date <= ( current_time( 'timestamp' ) + ( 60 * 60 * 24 * $shipping_time ) ) ) ? true : false;
+
+			return $no_postal;
+		}
 	}
+
+	return;
 }
 
 /**

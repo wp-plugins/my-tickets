@@ -186,6 +186,24 @@ function mt_ticket_method() {
 }
 
 /**
+ * Get ticket purchaser name
+ *
+ * @return mixed|string
+ */
+function mt_get_ticket_purchaser() {
+	$purchase    = get_post_meta( mt_get_ticket()->ID, '_'.mt_get_ticket_id(), true );
+	$purchase_id = $purchase['purchase_id'];
+	$purchaser = get_post_field( 'post_title', $purchase_id );
+
+	return $purchaser;
+}
+
+function mt_ticket_purchaser() {
+	echo mt_get_ticket_purchaser();
+}
+
+
+/**
  * Get custom field data; all by default, or only a specific field. Display in tickets.
  *
  * @param bool $custom_field

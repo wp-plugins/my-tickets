@@ -63,7 +63,7 @@ function mt_featured_tickets( $atts, $content = '' ) {
 			'events'   => false,
 			'view'     => 'calendar',
 			'time'     => 'month',
-			'template' => '<h3>{post_title}</h3><p>{post_excerpt}</p>',
+			'template' => '<h3>{post_title}: {event_begin format="l, F d"}</h3><p>{post_excerpt}</p>',
 		), $atts ) );
 	if ( $events ) {
 		$events = explode( ',', $events );

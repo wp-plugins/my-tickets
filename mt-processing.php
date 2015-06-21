@@ -37,6 +37,7 @@ function mt_add_ticket_form() {
 	} else {
 		$event_begin = $event_time = $checked = '';
 	}
+
 	$format .= "<p>
 					<input type='checkbox' class='mt-trigger' name='mt-trigger' id='mt-trigger'$checked /> <label for='mt-trigger'>" . __( 'Sell tickets on this post.', 'my-tickets' ) . "</label>
 				</p>";
@@ -182,7 +183,10 @@ function mt_registration_fields( $form, $has_data, $data, $public = 'admin' ) {
 	} else {
 		$is_hidden = '';
 	}
-	$form = "
+	if ( $registration ) {
+		$shortcode = "<textarea disabled='disabled'>[ticket event='$event_id']</textarea>";
+	}
+	$form = $shortcode . "
 	<p>
 		<label for='reg_expires'>" . __( 'Allow sales until', 'my-tickets' ) . "</label> <input type='number' name='reg_expires' id='reg_expires' value='$expiration' aria-labelledby='reg_expires reg_expires_label' size='3' /> <strong class='label' id='reg_expires_label'>" . __( 'hours before the event', 'my-tickets' ) . "</strong>
 	</p>

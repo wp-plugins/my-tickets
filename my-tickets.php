@@ -616,16 +616,16 @@ function mt_symbols( $currency ) {
 		"SGD" => '$',
 		"SEK" => 'kr ',
 		"DKK" => 'kr ',
-		"PLN" => '&#122;',
+		"PLN" => 'zł', // this is triggering an error. Why?
 		"NOK" => 'kr ',
 		"HUF" => 'Ft ',
-		"ILS" => '&#8362;',
+		"ILS" => '₪',
 		"MXN" => '$',
 		"BRL" => 'R$',
 		"MYR" => 'RM',
-		"PHP" => '&#8369;',
+		"PHP" => '₱',
 		"TWD" => 'NT$',
-		"THB" => '&#3647;',
+		"THB" => '฿',
 		"TRY" => 'TRY '
 	);
 

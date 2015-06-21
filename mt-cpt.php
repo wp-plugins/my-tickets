@@ -261,9 +261,9 @@ function mt_list_events( $purchase_id ) {
  *
  * @return array
  */
-function mt_setup_tickets( $purchase, $id ) {
+function mt_setup_tickets( $purchase, $id, $type='tickets' ) {
 	$options      = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
-	$ticket_array = array();
+	$ticket_array = $ticket_ids = array();
 	foreach ( $purchase as $purch ) {
 		foreach ( $purch as $event => $tickets ) {
 			$purchases[ $event ] = $tickets;
@@ -291,13 +291,14 @@ function mt_setup_tickets( $purchase, $id ) {
 						}
 
 						$ticket_array[] = add_query_arg( 'ticket_id', $ticket_id, get_permalink( $options['mt_tickets_page'] ) );
+						$ticket_ids[] = $ticket_id;
 					}
 				}
 			}
 		}
 	}
 
-	return $ticket_array;
+	return ( $type == 'tickets' ) ? $ticket_array : $ticket_ids;
 }
 
 add_filter( 'mt_format_transaction', 'mt_offline_transaction', 5, 2 );
