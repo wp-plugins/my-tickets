@@ -56,7 +56,7 @@ function mt_help() {
 							<textarea readonly='readonly'>[ticket event="1"]</textarea>
 
 							<p>
-								<?php _e( 'Display the Add to Cart form for a single event', 'my-tickets' ); ?>
+								<?php _e( 'Display the Add to Cart form for a single event.', 'my-tickets' ); ?> <?php _e( '"Event" attribute is the post ID for that event.', 'my-tickets' ); ?>
 							</p>
 
 							<textarea readonly='readonly'>[tickets events="1,2" template="&lt;h3&gt;{post_title}&lt;/h3&gt;"]</textarea>

@@ -64,6 +64,7 @@ function mt_handle_payment( $response, $response_code, $data, $post ) {
 		$mail_Body    = __( "Something went wrong. Hopefully this information will help:", 'my-tickets' ) . "\n\n";
 		$mail_Body .= print_r( $data, 1 );
 		$mail_Body .= print_r( $post, 1 );
+		$mail_Body .= print_r( $response, 1 );
 		wp_mail( $options['mt_to'], $mail_Subject, $mail_Body, $mail_From );
 		mt_log( $response, $response_code, $data, $post );
 	}

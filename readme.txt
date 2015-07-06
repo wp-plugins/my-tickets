@@ -66,7 +66,7 @@ Dutch, Norwegian (Bokmal)
 * Add 'Reservation' as payment status (admin-only by default)
 * Add 'Waiting List' as payment status (admin-only by default)
 
-= 1.1.1 =
+= 1.2.0 =
 
 * Modify reports to include notes field & payment ID.
 * Modify default report view to only show maximum of most recent 50 payments.
@@ -79,7 +79,7 @@ Dutch, Norwegian (Bokmal)
 * Added function to get purchaser name for ticket templates.
 * Added date to title output in default template for [tickets] shortcode.
 * Added view of [ticket] shortcode after editing event details in registration form panel.
-* Improved handling of Paypal IPN errors.
+* Improved handling of PayPal IPN errors.
 * Bug fix: Some broken currency symbols.
 * Bug fix: Reports list was limited to 10 events.
 * Translation: Polish

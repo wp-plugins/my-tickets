@@ -211,6 +211,19 @@ function mt_add_inner_box() {
 function mt_add_uneditable() {
 	global $post_id;
 	if ( isset( $_GET['post'] ) && isset( $_GET['action'] ) ) {
+
+		$dispute = get_post_meta( $post_id, '_dispute_reason', true );
+		$dispute_reason = get_post_meta( $post_id, '_dispute_message', true );
+
+		if ( $dispute ) {
+			$dispute_data = "<div class='mt-dispute'><h4>" . __( 'Ticket Dispute: ', 'my-tickets' ) . "</h4><ul>";
+			$dispute_data .= "<li>$dispute</li>";
+			$dispute_data .= "<li>$dispute_reason</li>";
+			$dispute_data .= "</ul></div>";
+		} else {
+			$dispute_date = '';
+		}
+
 		$receipt       = get_post_meta( $post_id, '_receipt', true );
 		$options  = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
 		$link    = add_query_arg( 'receipt_id', $receipt, get_permalink( $options['mt_receipt_page'] ) );
@@ -228,7 +241,7 @@ function mt_add_uneditable() {
 		if ( $other_data !== '' ) {
 			$other_data = "<div class='custom-data panel'><div class='inner'><h4>" . __( 'Custom Field Data', 'my-tickets' ) . "</h4>" . $other_data . "</div></div>";
 		}
-		echo '<div class="mt_post_fields panels">' . $transaction_data . $purchase_data . $ticket_data . $other_data . '</div>';
+		echo '<div class="mt_post_fields panels">' . $dispute_data . $transaction_data . $purchase_data . $ticket_data . $other_data . '</div>';
 	}
 }
 

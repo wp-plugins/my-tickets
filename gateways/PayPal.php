@@ -9,18 +9,20 @@ function mt_paypal_ipn() {
 		if ( isset( $_POST['payment_status'] ) ) {
 			$options  = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
 			$receiver = ( isset( $options['mt_paypal_email'] ) ) ? strtolower( $options['mt_paypal_email'] ) : false;
-			$url      = ( $options['mt_use_sandbox'] == 'true' ) ? 'https://www.sandbox.paypal.com/webscr' : 'https://www.paypal.com/webscr';
+			$url      = ( $options['mt_use_sandbox'] == 'true' ) ? 'https://www.sandbox.paypal.com/cgi-bin/webscr' : 'https://www.paypal.com/cgi-bin/webscr';
 
 			$req = 'cmd=_notify-validate';
 			foreach ( $_POST as $key => $value ) {
 				$value = urlencode( stripslashes( $value ) );
 				$req .= "&$key=$value";
 			}
+
 			$args   = wp_parse_args( $req, array() );
 			$params = array(
 				'body'      => $args,
 				'sslverify' => false,
 				'timeout'   => 30,
+				'user-agent' => 'WordPress/My Tickets'
 			);
 
 			// transaction variables to store
@@ -37,6 +39,7 @@ function mt_paypal_ipn() {
 			$parent           = isset( $_POST['parent_txn_id'] ) ? $_POST['parent_txn_id'] : '';
 			// paypal IPN data
 			$ipn           = wp_remote_post( $url, $params );
+
 			if ( is_wp_error( $ipn ) ) {
 				status_header( 503 ); die;
 			}
@@ -53,7 +56,7 @@ function mt_paypal_ipn() {
 				'country' => isset( $_POST['address_country_code'] ) ? $_POST['address_country_code'] : '',
 				'code'    => isset( $_POST['address_zip'] ) ? $_POST['address_zip'] : ''
 			);
-			//wp_mail( 'joe@joedolson.com', 'Shipping fields', print_r( $_POST, 1 ) );
+
 			$data = array(
 				'transaction_id' => $txn_id,
 				'price'          => $price,
@@ -73,42 +76,23 @@ function mt_paypal_ipn() {
 			$value_match = mt_check_payment_amount( $price, $item_number );
 			if ( ( $receiver && ( strtolower( $receiver_email ) != $receiver ) ) || $payment_currency != $options['mt_currency'] || !$value_match ) {
 				wp_mail( $options['mt_to'], __( 'Payment Conditions Error', 'my-tickets' ), __( "PayPal receiver email did not match account or payment currency did not match payment on $item_number", 'my-tickets' ) );
-				wp_die( __( "Payment conditions did not match expectations", 'my-tickets' ) );
+				status_header( 503 );
+				die;
 			}
 			mt_handle_payment( $response, $response_code, $data, $_POST );
 			// Everything's all right.
 			status_header( 200 );
 		} else {
-			/*
-			 * Array = example of opened dispute
-(
-    [txn_type] => new_case
-    [payment_date] => 11:59:14 Jun 19, 2015 PDT
-    [case_id] => PP-003-993-944-262
-    [case_type] => dispute
-    [business] => boxoffice@montrealfringe.ca
-    [verify_sign] => An5ns1Kso7MWUdW4ErQKJJJ4qi4-A4tHEcyDxWV.AQWV7GppbFfDzoUu
-    [payer_email] => florist@bulgariaflowers.com
-    [txn_id] => 81N30687U6469013P ---- ADD SEARCH BY TXN ID (Can already do search by TXN ID using WP default search in Payments. Awesome!)
-    [case_creation_date] => 14:14:42 Jun 19, 2015 PDT
-    [receiver_email] => boxoffice@montrealfringe.ca
-    [buyer_additional_information] => I never received the tickets and the event is now passed. I demand a full refund.
-    [payer_id] => 9U9K7PUR4N9MN
-    [receiver_id] => 7Y85C9XYUFTAL
-    [reason_code] => non_receipt
-    [custom] =>
-    [charset] => windows-1252
-    [notify_version] => 3.8
-    [ipn_track_id] => ec5afdb15a0ed
-)
-			 */
+
 			if ( isset( $_POST['txn_type'] ) ) {
 				// this is a transaction other than a purchase.
-				if ( $_POST['txn_type'] == 'new_case' && $_POST['case_type'] == 'dispute' ) {
-					// a purchaser has opened a dispute on this purchase.
-					// get payment based on $_POST['txn_id']
-					// set new post meta field _extended_transaction
-					// add set of notes to display for extended transactions.
+				if ( $_POST['case_type'] == 'dispute' ) {
+					$posts = get_posts( array( 'post_type'=> 'mt-payments', 'meta_key'=>'_transaction_id', 'meta_value'=>$_POST['txn_id'] ) );
+					if ( ! empty ( $posts ) ) {
+						$post = $posts[0];
+						update_post_meta( $post->ID, '_dispute_reason', $_POST['reason_code'] );
+						update_post_meta( $post->ID, '_dispute_message', $_POST['buyer_additional_information'] );
+					}
 
 				}
 				status_header( 200 );
