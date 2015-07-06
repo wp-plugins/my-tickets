@@ -66,6 +66,12 @@ Dutch, Norwegian (Bokmal)
 * Add 'Reservation' as payment status (admin-only by default)
 * Add 'Waiting List' as payment status (admin-only by default)
 
+
+= 1.2.1 =
+
+* Re-send email and ticket delivery status checkboxes would not uncheck.
+* Invalid Ticket URLs sent in notification messages.
+
 = 1.2.0 =
 
 * Modify reports to include notes field & payment ID.

@@ -221,7 +221,7 @@ function mt_add_uneditable() {
 			$dispute_data .= "<li>$dispute_reason</li>";
 			$dispute_data .= "</ul></div>";
 		} else {
-			$dispute_date = '';
+			$dispute_data = '';
 		}
 
 		$receipt       = get_post_meta( $post_id, '_receipt', true );
@@ -274,7 +274,7 @@ function mt_list_events( $purchase_id ) {
  *
  * @return array
  */
-function mt_setup_tickets( $purchase, $id, $type='tickets' ) {
+function mt_setup_tickets( $purchase, $id ) {
 	$options      = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
 	$ticket_array = $ticket_ids = array();
 	foreach ( $purchase as $purch ) {
@@ -303,15 +303,14 @@ function mt_setup_tickets( $purchase, $id, $type='tickets' ) {
 							) );
 						}
 
-						$ticket_array[] = add_query_arg( 'ticket_id', $ticket_id, get_permalink( $options['mt_tickets_page'] ) );
-						$ticket_ids[] = $ticket_id;
+						$ticket_array[$ticket_id] = add_query_arg( 'ticket_id', $ticket_id, get_permalink( $options['mt_tickets_page'] ) );
 					}
 				}
 			}
 		}
 	}
 
-	return ( $type == 'tickets' ) ? $ticket_array : $ticket_ids;
+	return $ticket_array;
 }
 
 add_filter( 'mt_format_transaction', 'mt_offline_transaction', 5, 2 );
@@ -505,6 +504,9 @@ function mt_post_meta( $id ) {
 
 		if ( is_array( $fields ) ) {
 			foreach ( $fields as $key => $value ) {
+				if ( $value['type'] == 'checkbox' && !isset( $_POST["_" . $key ] ) ) {
+					delete_post_meta( $id, "_" . $key );
+				}
 				if ( isset( $_POST[ "_" . $key ] ) ) {
 					$value = $_POST[ "_" . $key ];
 					update_post_meta( $id, "_" . $key, $value );
