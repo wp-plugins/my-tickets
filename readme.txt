@@ -5,9 +5,9 @@ Tags: events, ticket sales, tickets, ticketing, registration, reservations, even
 Requires at least: 4.0
 Tested up to: 4.2.2
 License: GPLv2 or later
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 
-My Tickets is an easy-to-use, flexible platform for selling event tickets.
+My Tickets is an easy-to-use, flexible platform for selling event tickets with WordPress.
 
 == Description ==
 
@@ -171,6 +171,18 @@ Dutch, Norwegian (Bokmal)
 
 The My Tickets sales information is entered in the 'Registration Information' panel of the My Calendar add event screen. This may be turned off in your installation. There are two places to look to enable it. First, go to My Calendar > Settings and go to the Input Settings section. If the 'registration' option isn't checked, check it and save settings. Second, go to the Add Event screen. If the registration options still aren't visible, you may need to enable them in your personal Screen Options. Open the Screen Options panel and check the option there - these are settings that apply only to your account.
 
+= If I visit the 'Tickets' or 'Receipts' pages, I end up on the Purchase page. What's happening? =
+
+The Tickets and Receipts pages are only for displaying purchased tickets or purchase receipts. If no valid ID for one of those resources is included, then they'll redirect to the shopping cart.
+
+= How do I scan QR Codes for events? =
+
+You can use any QR Code scanning app for a mobile phone or other mobile device with a camera. In order to get the ticket status confirmation, you'll need to be connected to a network.
+
+= Is the "number of tickets available" field required? =
+
+Yes. My Tickets won't sell an unlimited number of tickets for an event; in order for My Tickets to sell anything, you need to specify how many tickets it's allowed to sell.
+
 == Screenshots ==
 
 1. Add to Cart Form
@@ -179,4 +191,4 @@ The My Tickets sales information is entered in the 'Registration Information' pa
 
 == Upgrade Notice ==
 
-1.1.0: Important bug fixes, minor new features, Norwegian translation.
+1.2.0: Important PayPal bug fix; several new features.
