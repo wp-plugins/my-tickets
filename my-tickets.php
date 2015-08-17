@@ -5,7 +5,7 @@ Plugin URI: http://www.joedolson.com/my-tickets/
 Description: Sell Tickets and take registrations for your events. Integrates with My Calendar.
 Author: Joseph C Dolson
 Author URI: http://www.joedolson.com
-Version: 1.2.1
+Version: 1.2.2
 */
 /*  Copyright 2014-2015  Joe Dolson (email : joe@joedolson.com)
 
@@ -24,7 +24,7 @@ Version: 1.2.1
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 global $mt_version;
-$mt_version = '1.2.1';
+$mt_version = '1.2.2';
 
 load_plugin_textdomain( 'my-tickets', false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );
 
@@ -202,7 +202,8 @@ function mt_public_enqueue_scripts() {
 		array(
 			'action'   => 'mt_ajax_cart',
 			'url'      => admin_url( 'admin-ajax.php' ),
-			'security' => wp_create_nonce( 'mt-ajax-cart-nonce' )
+			'security' => wp_create_nonce( 'mt-ajax-cart-nonce' ),
+			'max_limit'=> __( "You've reached the maximum number of tickets available for this purchase.", 'my-tickets' )
 		)
 	);
 }

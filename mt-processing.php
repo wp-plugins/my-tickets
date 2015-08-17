@@ -14,7 +14,9 @@ add_action( 'admin_menu', 'mt_add_ticket_box' );
 function mt_add_ticket_box() {
 	$options = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
 	foreach ( $options['mt_post_types'] as $name ) {
-		add_meta_box( 'mt_custom_div', __( 'My Tickets Purchase Data', 'my-tickets' ), 'mt_add_ticket_form', $name, 'normal', 'high' );
+		if ( $name != 'mc-events' ) {
+			add_meta_box( 'mt_custom_div', __( 'My Tickets Purchase Data', 'my-tickets' ), 'mt_add_ticket_form', $name, 'normal', 'high' );
+		}
 	}
 }
 
@@ -184,7 +186,9 @@ function mt_registration_fields( $form, $has_data, $data, $public = 'admin' ) {
 		$is_hidden = '';
 	}
 	if ( $registration ) {
-		$shortcode = "<textarea disabled='disabled'>[ticket event='$event_id']</textarea>";
+		$shortcode = "<textarea readonly='readonly' class='large-text readonly'>[ticket event='$event_id']</textarea>";
+	} else {
+		$shortcode = '';
 	}
 	$form = $shortcode . "
 	<p>
@@ -232,6 +236,7 @@ function mt_prices_table( $registration = array() ) {
 	$options  = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
 	$counting = $options['defaults']['counting_method'];
 	$pricing  = $options['defaults']['pricing'];
+	$available = '';
 	$tickets  = ( isset( $options['defaults']['tickets'] ) ) ? $options['defaults']['tickets'] : false;
 	$return   = "<table class='widefat mt-pricing'>
 					<caption>" . __( 'Ticket Prices and Availability', 'my-tickets' ) . "</caption>

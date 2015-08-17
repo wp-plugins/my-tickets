@@ -368,7 +368,7 @@ function mt_generate_cart( $user_ID = false ) {
 		$output   = mt_generate_gateway( $cart );
 	} else {
 		$cart         = mt_get_cart( $user_ID );
-		$total        = mt_total_cart( $cart );
+		$total        = apply_filters( 'mt_generate_cart_total', mt_total_cart( $cart ) );
 		$count        = mt_count_cart( $cart );
 		$handling_total = ( isset( $options['mt_handling'] ) ) ? $options['mt_handling'] : 0;
 		$handling       = apply_filters( 'mt_money_format', $handling_total );
@@ -506,6 +506,10 @@ function mt_generate_cart_table( $cart, $format = 'cart' ) {
 				$prices       = mt_get_prices( $event_id );
 				$currency     = $options['mt_currency'];
 				$event        = get_post( $event_id );
+				if ( ! is_object( $event ) ) {
+					// this is coming from a deleted event
+					continue;
+				}
 				$title        = apply_filters( 'mt_link_title', $event->post_title, $event );
 				$image        = ( has_post_thumbnail( $event_id ) ) ? get_the_post_thumbnail( $event_id, array( 80, 80 ) ) : '';
 				$data         = get_post_meta( $event_id, '_mc_event_data', true );
@@ -522,6 +526,24 @@ function mt_generate_cart_table( $cart, $format = 'cart' ) {
 							if ( isset( $prices[ $type ] ) ) {
 								$price = mt_handling_price( $prices[ $type ]['price'], $event_id, $type );
 								$label = $prices[ $type ]['label'];
+								if ( $registration['counting_method'] == 'discrete' ) {
+									$available = $prices[ $type ]['tickets'];
+									$sold      = $prices[ $type ]['sold'];
+								} else {
+									$available = $registration['total'];
+									$sold      = 0;
+									foreach ( $registration['prices'] as $pricetype ) {
+										$sold = $sold +intval( ( isset( $pricetype['sold'] ) ) ? $pricetype['sold'] : 0 );
+									}
+								}
+								$remaining = $available - $sold;
+								$max_limit = apply_filters( 'mt_max_sale_per_event', false );
+								if ( $max_limit ) {
+									$max = ( $max_limit > $remaining ) ? $remaining : $max_limit;
+								} else {
+									$max = $remaining;
+								}
+								if ( $count > $max ) { $count = $max; }
 								if ( $format == 'cart' || is_admin() ) {
 									$hidden = "
 											<input type='hidden' class='mt_count' name='mt_cart_order[$event_id][$type][count]' value='$count' />
@@ -535,10 +557,10 @@ function mt_generate_cart_table( $cart, $format = 'cart' ) {
 											<tr id='mt_cart_order_$event_id" . '_' . "$type'>
 												<th scope='row'>$image$title: <em>$label</em><br />$datetime$hidden$custom</th>
 												<td>$currency " . apply_filters( 'mt_money_format', $price ) . "</td>
-												<td aria-live='assertive'><span class='count'>$count</span></td>";
+												<td aria-live='assertive'><span class='count' data-limit='$max'>$count</span></td>";
 								if ( $format == 'cart' && apply_filters( 'mt_include_update_column', true ) ) {
 									if ( $registration['multiple'] == 'true' ) {
-										$output .= "<td class='mt-update-column'><button data-id='$event_id' data-type='$type' rel='#mt_cart_order_$event_id" . '_' . "$type' class='more'>+<span class='screen-reader-text'> " . __( 'More', 'my-tickets' ) . "</span></button> <button data-id='$event_id' data-type='$type' rel='#mt_cart_order_$event_id" . '_' . "$type' class='less'>-<span class='screen-reader-text'> " . __( 'Less', 'my-tickets' ) . "</span></button> <button data-id='$event_id' data-type='$type' rel='#mt_cart_order_$event_id" . '_' . "$type' class='remove'>x<span class='screen-reader-text'> " . __( 'Remove from cart', 'my-tickets' ) . "</span></button></td>";
+										$output .= "<td class='mt-update-column'><button data-id='$event_id' data-type='$type' rel='#mt_cart_order_$event_id" . '_' . "$type' class='more'>+<span class='screen-reader-text'> " . __( 'Add a ticket', 'my-tickets' ) . "</span></button> <button data-id='$event_id' data-type='$type' rel='#mt_cart_order_$event_id" . '_' . "$type' class='less'>-<span class='screen-reader-text'> " . __( 'Remove a ticket', 'my-tickets' ) . "</span></button> <button data-id='$event_id' data-type='$type' rel='#mt_cart_order_$event_id" . '_' . "$type' class='remove'>x<span class='screen-reader-text'> " . __( 'Remove from cart', 'my-tickets' ) . "</span></button></td>";
 									} else {
 										$output .= "<td class='mt-update-column'><button data-id='$event_id' data-type='$type' rel='#mt_cart_order_$event_id" . '_' . "$type' class='remove'>x<span class='screen-reader-text'> " . __( 'Remove from cart', 'my-tickets' ) . "</span></button>" . apply_filters( 'mt_no_multiple_registration', '' ) . "</td>";
 									}
@@ -703,6 +725,9 @@ function mt_expired( $event ) {
 		$options    = get_post_meta( $event, '_mt_registration_options', true );
 		$data       = get_post_meta( $event, '_mc_event_data', true );
 		if ( is_array( $data ) && is_array( $options ) && !empty( $options ) ) {
+			if ( !isset( $data['event_begin'] ) ) {
+				return;
+			}
 			$expires    = ( isset( $options['reg_expires'] ) ) ? $options['reg_expires'] : 0;
 			$expiration = $expires * 60 * 60;
 			$begin      = strtotime( $data['event_begin'] . ' ' . $data['event_time'] ) - $expiration;

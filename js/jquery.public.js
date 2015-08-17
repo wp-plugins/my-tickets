@@ -45,6 +45,7 @@
             var event_id = $(this).attr('data-id');
             var event_type = $(this).attr('data-type');
             var val = $(target + ' .mt_count').val();
+            var remain = $(target + ' .count').attr( 'data-limit' );
 
             if (action == 'more') {
                 var newval = parseInt(val) + 1;
@@ -58,38 +59,43 @@
                 var newval = 0;
                 $(target).addClass('removed');
             }
-
-            $(target + ' .mt_count').val(newval);
-            $(target + ' span.count').text(newval);
-            var total = 0;
-            var tCount = 0;
-            $('td .count').each( function () {
-                if ( $(this).is( ':visible' ) ) {
-                    var count = $(this).text();
-                    var price = $(this).parent('td').siblings().children('.price').text();
-                    total += parseInt(count) * parseFloat(price);
-                    tCount += parseInt(count);
-                }
-            });
-            var mtTotal = parseFloat(total).toFixed(2).replace('/(\d)(?=(\d{3})+\.)/g', "$1,");
-            if ( mtTotal < 0 || tCount <= 0 ) {
-                $( 'input[name="mt_submit"]').prop( 'disabled', true );
+            if ( newval > remain && action == 'more' ) {
+                $( '.mt-response').html("<p>" + mt_ajax_cart.max_limit + "</p>").show(300);
             } else {
-                $( 'input[name="mt_submit"]').prop( 'disabled', false );
-            }
-            $('.mt_total_number').text( mt_ajax.currency + mtTotal.toString());
-
-            var data = {
-                'action': mt_ajax_cart.action,
-                'data': {mt_event_id: event_id, mt_event_tickets: newval, mt_event_type: event_type},
-                'security': mt_ajax_cart.security
-            };
-            $.post(mt_ajax_cart.url, data, function (response) {
-                if (response.success == 1) {
-                    $('.mt-response').html("<p>" + response.response + "</p>").show(300);
+                $(target + ' .mt_count').val(newval);
+                $(target + ' span.count').text(newval);
+                var total = 0;
+                var tCount = 0;
+                $('td .count').each(function () {
+                    if ($(this).is(':visible')) {
+                        var count = $(this).text();
+                        var price = $(this).parent('td').siblings().children('.price').text();
+                        total += parseInt(count) * parseFloat(price);
+                        tCount += parseInt(count);
+                    }
+                });
+                var mtTotal = parseFloat(total).toFixed(2).replace('/(\d)(?=(\d{3})+\.)/g', "$1,");
+                if ( mtTotal < 0 || tCount <= 0 ) {
+                    $( 'input[name="mt_submit"]').prop( 'disabled', true );
+                } else {
+                    $( 'input[name="mt_submit"]').prop( 'disabled', false );
                 }
-            }, "json");
+                $('.mt_total_number').text( mt_ajax.currency + mtTotal.toString());
 
+                var data = {
+                    'action': mt_ajax_cart.action,
+                    'data': {mt_event_id: event_id, mt_event_tickets: newval, mt_event_type: event_type},
+                    'security': mt_ajax_cart.security
+                };
+                $.post(mt_ajax_cart.url, data, function (response) {
+                    if (response.success == 1) {
+                        $('.mt-response').html("<p>" + response.response + "</p>").show(300);
+                    }
+                }, "json");
+            }
+           // $( '#mtd_donation').on( 'change', function(e) {
+
+          //  });
         });
 
         $('.gateway-selector a').on('click', function (e) {

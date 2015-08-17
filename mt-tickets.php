@@ -67,7 +67,8 @@ function mt_get_ticket( $ticket_id = false ) {
 		$posts  = get_posts( array(
 				'post_type'  => $options['mt_post_types'],
 				'meta_key'   => '_ticket',
-				'meta_value' => $ticket_id
+				'meta_value' => $ticket_id,
+				'post_status'=> array( 'private', 'publish' )
 			) );
 		$ticket = ( isset( $posts[0] ) ) ? $posts[0] : false;
 	}

@@ -313,7 +313,7 @@ function mt_select_events() {
 		array(
 			'post_type'   => $settings['mt_post_types'],
 			'posts_per_page'  => apply_filters( 'mt_select_events_count', 50 ),
-			'post_status' => array( 'publish', 'draft' ),
+			'post_status' => array( 'publish', 'draft', 'private' ),
 			'meta_query'  => array(
 				'relation' => 'AND',
 				'queries'  => array(
@@ -331,10 +331,11 @@ function mt_select_events() {
 		$selected = ( isset( $_GET['event_id'] ) && $_GET['event_id'] == $post->ID ) ? ' selected="selected"' : '';
 		$event_data = get_post_meta( $post->ID, '_mc_event_data', true );
 		$event_date = strtotime( $event_data['event_begin'] );
+		$display_date = date_i18n( get_option( 'date_format' ), $event_date );
 		// if this event happened more than a month ago, don't show in list *unless* it's the currently selected report.
 		$report_age_limit = apply_filters( 'mt_reports_age_limit', current_time( 'timestamp' ) - 31*24*60*60 );
 		if ( $event_date > $report_age_limit || $selected == ' selected="selected"' ) {
-			$options .= "<option value='$post->ID'$selected>$post->post_title ($count)</option>\n";
+			$options .= "<option value='$post->ID'$selected>$post->post_title ($count); $display_date</option>\n";
 		}
 	}
 
@@ -386,6 +387,7 @@ function mt_purchases( $event_id, $options = array( 'include_failed' => false ) 
 					$transaction   = get_post_meta( $purchase_id, '_transaction_data', true );
 					$address       = ( isset( $transaction['shipping'] ) ) ? $transaction['shipping'] : false;
 					$phone         = get_post_meta( $purchase_id, '_phone', true );
+					$fee           = ( isset( $transaction['fee'] ) ) ? $transaction['fee'] : false;
 
 					$street        = ( isset( $address['street'] ) ) ? $address['street'] : '';
 					$street2       = ( isset( $address['street2'] ) ) ? $address['street2'] : '';
@@ -415,7 +417,7 @@ function mt_purchases( $event_id, $options = array( 'include_failed' => false ) 
 					$alternate = ( $alternate == 'alternate' ) ? 'even' : 'alternate';
 					$row       = "<tr class='$alternate'><th scope='row'>$purchaser</th><td>$notes</td><td>$type</td><td>$count</td><td>" . apply_filters( 'mt_money_format', $price ) . "</td><td>" . apply_filters( 'mt_money_format', $paid ) . "</td><td class='mt_ticket_type'><span class='mt $class'>$ticket_type</span></td><td>$datetime</td><td>$purchase_id</td>$custom_cells</tr>";
 					// add split field to csv headers
-					$csv                         = "\"$last_name\",\"$first_name\",\"$email\",\"$type\",\"$count\",\"$price\",\"$paid\",\"$ticket_type\",\"$date\",\"$time\",\"$phone\",\"$street\",\"$street2\",\"$city\",\"$state\",\"$code\",\"$country\"$custom_csv" . PHP_EOL;
+					$csv                         = "\"$last_name\",\"$first_name\",\"$email\",\"$type\",\"$count\",\"$price\",\"$paid\",\"$fee\",\"$ticket_type\",\"$date\",\"$time\",\"$phone\",\"$street\",\"$street2\",\"$city\",\"$state\",\"$code\",\"$country\"$custom_csv" . PHP_EOL;
 					$report['html'][ $status ][] = $row;
 					$report['csv'][ $status ][]  = $csv;
 				}
@@ -527,7 +529,8 @@ function mt_download_csv_event() {
 		       . __( 'Purchased', 'my-tickets' ) . ","
 		       . __( 'Price', 'my-tickets' ) . ","
 		       . __( 'Paid', 'my-tickets' ) . ","
-		       . __( 'Ticket Method', 'my-tickets' ) . ","
+		       . __( 'Fees', 'my-tickets' ) . ","
+ 		       . __( 'Ticket Method', 'my-tickets' ) . ","
 		       . __( 'Date', 'my-tickets' ) . ","
 		       . __( 'Time', 'my-tickets' ) . ","
 		       . __( 'Phone', 'my-tickets' ) . ","

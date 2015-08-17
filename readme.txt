@@ -66,6 +66,15 @@ Dutch, Norwegian (Bokmal)
 * Add 'Reservation' as payment status (admin-only by default)
 * Add 'Waiting List' as payment status (admin-only by default)
 
+= 1.2.2 =
+
+* Allow tickets to be sold on posts with status 'private'
+* Show event date in reports drop down
+* Revised HTML so it's easy to hide remaining tickets notices
+* Prevent user from increasing number of tickets in cart to more than available.
+* Add filter to enable max ticket limit per purchase/type for an event. 'mt_max_sale_per_event'
+* Add fees field to reports output in addition to sales values.
+* Add filter on cart total used to determine whether or not to show payment gateway form.
 
 = 1.2.1 =
 

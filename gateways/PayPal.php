@@ -75,7 +75,7 @@ function mt_paypal_ipn() {
 			// if no receiver email provided, that check will be skipped.
 			$value_match = mt_check_payment_amount( $price, $item_number );
 			if ( ( $receiver && ( strtolower( $receiver_email ) != $receiver ) ) || $payment_currency != $options['mt_currency'] || !$value_match ) {
-				wp_mail( $options['mt_to'], __( 'Payment Conditions Error', 'my-tickets' ), __( "PayPal receiver email did not match account or payment currency did not match payment on $item_number", 'my-tickets' ) );
+				wp_mail( $options['mt_to'], __( 'Payment Conditions Error', 'my-tickets' ), __( "PayPal receiver email did not match account or payment currency did not match payment on $item_number", 'my-tickets' ) . "\n" . print_r( $post, 1 ) . "\n" . print_r( $data, 1 ) );
 				status_header( 503 );
 				die;
 			}

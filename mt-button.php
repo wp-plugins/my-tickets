@@ -134,17 +134,26 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 								$tickets   = $settings['tickets'];
 								$sold      = $settings['sold'];
 								$remaining = ( $tickets - $sold );
+								$max_limit = apply_filters( 'mt_max_sale_per_event', false );
+								if ( $max_limit ) {
+									$max = ( $max_limit > $remaining ) ? $remaining : $max_limit;
+								} else {
+									$max = $remaining;
+								}
 								$disable   = ( $remaining < 1 ) ? ' disabled="disabled"' : '';
 								if ( $attributes == '' ) {
-									$attributes = " min='0' max='$remaining'";
+									$attributes = " min='0' max='$max'";
 									if ( $remaining == 0 ) {
 										$attributes .= ' readonly="readonly"';
 									}
 								}
 								$form .= "
-								<label for='mt_tickets_$type' id='mt_tickets_label_$type'>" . esc_attr( $settings['label'] ) . "</label>
-								<input type='$input_type' name='mt_tickets[$type]' id='mt_tickets_$type' class='tickets_field' value='$value' $attributes aria-labelledby='mt_tickets_label_$type mt_tickets_data_$type'$disable />
-								<span id='mt_tickets_data_$type' class='tickets-remaining'>" . sprintf( __( '(%1$s, %2$s/%3$d remaining)', 'my-tickets' ), $ticket_price_label, "<span class='value'>" . $remaining . "</span>", $tickets ) . "</span><span class='mt-error-notice' aria-live='assertive'></span><br />";
+									<label for='mt_tickets_$type' id='mt_tickets_label_$type'>" . esc_attr( $settings['label'] ) . "</label>
+									<input type='$input_type' name='mt_tickets[$type]' id='mt_tickets_$type' class='tickets_field' value='$value' $attributes aria-labelledby='mt_tickets_label_$type mt_tickets_data_$type'$disable />";
+								$form .= "<span id='mt_tickets_data_$type' class='ticket-pricing'>" .
+									            sprintf( apply_filters( 'mc_tickets_remaining_discrete_text', __( '(%1$s<span class="tickets-remaining">, %2$s remaining</span>)', 'my-tickets' ), $ticket_price_label, $remaining, $tickets ), $ticket_price_label, "<span class='value remaining-tickets'>" . $remaining . "</span>/<span class='ticket-count'>" . $tickets . "</span>" ) .
+									         "</span>";
+								$form .= "<span class='mt-error-notice' aria-live='assertive'></span><br />";
 								$total_order = $total_order + $value;
 							} else {
 								$remaining = $tickets_remaining;
@@ -172,7 +181,7 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 				}
 			}
 			if ( $available != 'inherit' ) {
-				$remaining_notice = '<p class="tickets-remaining">' . sprintf( apply_filters( 'mt_tickets_remaining_text', __( '%s tickets remaining.', 'my-tickets' ) ), "<span class='value'>" . $tickets_remaining . "</span>" ) . '</p>';
+				$remaining_notice = '<p class="tickets-remaining">' . sprintf( apply_filters( 'mt_tickets_remaining_continuous_text', __( '%s tickets remaining.', 'my-tickets' ) ), "<span class='value'>" . $tickets_remaining . "</span>" ) . '</p>';
 			} else {
 				$remaining_notice = '';
 			}
@@ -318,7 +327,7 @@ function mt_sales_close( $event_id, $expires ) {
 			$expiration = $expires * 60 * 60;
 			$begin      = strtotime( $event['event_begin'] . ' ' . $event['event_time'] ) - $expiration;
 			if ( date( 'Y-m-d', $begin ) == date( 'Y-m-d', current_time( 'timestamp' ) ) ) {
-				return "<p>" . sprintf( __( 'Ticket sales close at %s today', 'my-tickets' ), "<strong>" . date_i18n( get_option( 'time_format' ), $begin ) . "</strong>" ) . "</p>";
+				return "<p>" . sprintf( apply_filters( 'mt_ticket_sales_close_text', __( 'Ticket sales close at %s today', 'my-tickets' ), "<strong>" . date_i18n( get_option( 'time_format' ), $begin ) . "</strong>" ) ) . "</p>";
 			}
 		}
 	}
