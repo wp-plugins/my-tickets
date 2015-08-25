@@ -2,6 +2,7 @@
 
 add_shortcode( 'quick-cart', 'my_tickets_short_cart' );
 add_filter( 'universal_top_of_header', 'my_tickets_short_cart', 10, 1 );
+add_filter( 'milky_way_top_of_header', 'my_tickets_short_cart', 10, 1 );
 /**
  * Shortcode to add quick cart to site. Shows current number of tickets and total value plus link to checkout.
  *

@@ -116,6 +116,10 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 						if ( $type == 'complementary' && $comps == false ) {
 							continue;
 						}
+						$extra_label = apply_filters( 'mt_extra_label', '', $event, $type );
+						if ( $type == 'complementary' ) {
+							$extra_label = '<span class="mt-admin-only">( ' . __( 'Administrators only', 'my-tickets' ) . ' )</span>';
+						}
 						if ( $type ) {
 							$price      = mt_handling_price( $settings['price'], $event, $type );
 							$price      = apply_filters( 'mt_money_format', mt_calculate_discount( $price ) );
@@ -152,7 +156,8 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 									<input type='$input_type' name='mt_tickets[$type]' id='mt_tickets_$type' class='tickets_field' value='$value' $attributes aria-labelledby='mt_tickets_label_$type mt_tickets_data_$type'$disable />";
 								$form .= "<span id='mt_tickets_data_$type' class='ticket-pricing'>" .
 									            sprintf( apply_filters( 'mc_tickets_remaining_discrete_text', __( '(%1$s<span class="tickets-remaining">, %2$s remaining</span>)', 'my-tickets' ), $ticket_price_label, $remaining, $tickets ), $ticket_price_label, "<span class='value remaining-tickets'>" . $remaining . "</span>/<span class='ticket-count'>" . $tickets . "</span>" ) .
-									         "</span>";
+									        $extra_label .
+									          "</span>";
 								$form .= "<span class='mt-error-notice' aria-live='assertive'></span><br />";
 								$total_order = $total_order + $value;
 							} else {
@@ -166,7 +171,7 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 								$form .= "
 								<label for='mt_tickets_$type' id='mt_tickets_label_$type'>" . esc_attr( $settings['label'] ) . "</label>
 								<input type='$input_type' name='mt_tickets[$type]' $attributes id='mt_tickets_$type' class='tickets_field' value='$value' aria-labelledby='mt_tickets_label_$type mt_tickets_data_$type' />
-								<span id='mt_tickets_data_$type'>$ticket_price_label</span><span class='mt-error-notice' aria-live='assertive'></span><br />";
+								<span id='mt_tickets_data_$type'>$ticket_price_label</span>$extra_label<span class='mt-error-notice' aria-live='assertive'></span><br />";
 								$total_order = $total_order + $value;
 							}
 							$has_tickets = true;

@@ -138,11 +138,12 @@ function mt_required_fields( $cart ) {
 
 /**
  * Test whether user is logged in and whether user registration is allowed. Return invitation to log-in or register.
+ * Displays only if public registration is enabled.
  *
  * @return string|void
  */
 function mt_invite_login_or_register() {
-	if ( ! is_user_logged_in() ) {
+	if ( ! is_user_logged_in() && get_option( 'users_can_register' ) == '1' ) {
 		$login = apply_filters( 'mt_login_html', "<a href='" . wp_login_url() . "'>" . __( 'Log in', 'my-tickets' ) . "</a>" );
 		if ( get_option( 'users_can_register' ) == '1' ) {
 			$register = apply_filters( 'mt_register_html', "<a href='" . wp_registration_url() . "'>" . __( 'Create an account', 'my-tickets' ) . "</a>" );
@@ -375,9 +376,6 @@ function mt_generate_cart( $user_ID = false ) {
 		$nonce          = wp_nonce_field( 'mt_cart_nonce', '_wpnonce', true, false );
 		$enabled        = $options['mt_gateway'];
 		$current_gate   = ( isset( $_GET['mt_gateway'] ) && in_array( $_GET['mt_gateway'], $enabled ) ) ? $_GET['mt_gateway'] : $options['mt_default_gateway'];
-		if ( $total == 0 ) {
-			$current_gate = 'offline';
-		}
 		$gateway   = "<input type='hidden' name='mt_gateway' value='" . esc_attr( $current_gate ) . "' />";
 		$cart_page = get_permalink( $options['mt_purchase_page'] );
 		if ( is_array( $cart ) && ! empty( $cart ) && $count > 0 ) {
@@ -655,14 +653,18 @@ function mt_generate_gateway( $cart ) {
 	if ( $count > 0 ) {
 		$payment        = mt_get_data( 'payment' );
 		$ticket_method  = ( isset( $_POST['ticketing_method'] ) ) ? $_POST['ticketing_method'] : 'willcall';
-		$mt_gateway     = ( isset( $_POST['mt_gateway'] ) ) ? $_POST['mt_gateway'] : 'offline';
 		$shipping_total = ( $ticket_method == 'postal' ) ? $options['mt_shipping'] : 0;
 		$handling_total = ( isset( $options['mt_handling'] ) ) ? $options['mt_handling'] : 0;
 		$shipping       = ( $shipping_total ) ? "<div class='mt_cart_shipping mt_cart_label'>" . __( 'Shipping:', 'my-tickets' ) . " <span class='mt_shipping_number mt_cart_value'>" . apply_filters( 'mt_money_format', $shipping_total ) . "</span></div>" : '';
 		$handling       = ( $handling_total ) ? "<div class='mt_cart_handling mt_cart_label'>" . __( 'Handling:', 'my-tickets' ) . " <span class='mt_handling_number mt_cart_value'>" . apply_filters( 'mt_money_format', $handling_total ) . "</span></div>" : '';
 		$tick_handling  = mt_handling_notice();
+		$mt_gateway     = ( isset( $_POST['mt_gateway'] ) ) ? $_POST['mt_gateway'] : 'offline';
 		$other_charges  = apply_filters( 'mt_custom_charges', 0, $cart, $mt_gateway );
 		$other_notices  = apply_filters( 'mt_custom_notices', '', $cart, $mt_gateway );
+		if ( $total + $shipping_total + $handling_total + $other_charges == 0 && $mt_gateway != 'offline' ) {
+			$mt_gateway = 'offline';
+		}
+
 		$report_total   = "<div class='mt_cart_total'>" . apply_filters( 'mt_cart_total_text', __( 'Total:', 'my-tickets' ), $mt_gateway ) . " <span class='mt_total_number'>" . apply_filters( 'mt_money_format', $total + $shipping_total + $handling_total + $other_charges ) . "</span></div>";
 		$args           = apply_filters( 'mt_payment_form_args', array( 'cart'    => $cart,
 		                                                                'total'   => $total,

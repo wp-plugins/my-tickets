@@ -3,9 +3,9 @@ Contributors: joedolson
 Donate link: http://www.joedolson.com/donate/
 Tags: events, ticket sales, tickets, ticketing, registration, reservations, event tickets, sell tickets, event registration, box office
 Requires at least: 4.0
-Tested up to: 4.2.2
+Tested up to: 4.3.0
 License: GPLv2 or later
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 
 My Tickets is an easy-to-use, flexible platform for selling event tickets with WordPress.
 
@@ -65,6 +65,16 @@ Dutch, Norwegian (Bokmal)
 * Improve options when there are multiple dates available for a specific event. Multiple ticket patterns w/separate pricing & availability options, etc.? Note accessibility features?
 * Add 'Reservation' as payment status (admin-only by default)
 * Add 'Waiting List' as payment status (admin-only by default)
+* Add option to use radio buttons instead of checkboxes
+
+= 1.2.3 =
+
+* Moved logic that switched to offline gateway if total = 0
+* Only display login link if public registration is enabled
+* Fallback function for money_format(), since that function is not supported on Windows
+* Clearly label complementary tickets as admin only
+* Delete My Tickets pages on uninstall
+* Move focus to Cart link when Add to Cart
 
 = 1.2.2 =
 

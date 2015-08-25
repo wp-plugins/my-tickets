@@ -117,7 +117,7 @@
                 'security': mt_ajax.security
             };
             $.post(mt_ajax.url, data, function (response) {
-                $('#mt-response-' + response.event_id).html("<p>" + response.response + "</p>").show(300);
+                $('#mt-response-' + response.event_id).html("<p>" + response.response + "</p>").show(300).attr('tabindex','-1').focus();
                 if (response.success == 1) {
                     $('.mt_qc_tickets').text(response.count);
                     $('.mt_qc_total').text(parseFloat(response.total, 10).toFixed(2).replace('/(\d)(?=(\d{3})+\.)/g', "$1,").toString());
