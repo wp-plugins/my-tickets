@@ -67,6 +67,10 @@ Dutch, Norwegian (Bokmal)
 * Add 'Waiting List' as payment status (admin-only by default)
 * Add option to use radio buttons instead of checkboxes
 
+= 1.2.4 =
+
+* There was an incomplete SVN commit on 1.2.3 that caused update issues. This enables people with "this isn't really 1.2.3" to update.
+
 = 1.2.3 =
 
 * Moved logic that switched to offline gateway if total = 0
