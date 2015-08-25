@@ -1,0 +1,156 @@
+.my-tickets .postbox {
+    margin: 10px 10px 0 0
+}
+
+.my-tickets .postbox .inside {
+    overflow: visible !important
+}
+
+.mt-pricing tr.fade {
+    background: #ff9;
+    transition: background .5s ease-in-out;
+}
+
+.mt-pricing tr.fade:hover {
+    background: #ffe;
+}
+
+/* some plugins change this, but I need it at WP default. */
+.my-tickets .meta-box-sortables {
+    min-height: 0
+}
+
+.widefat .controls .button {
+    padding: 0 4px;
+    line-height: 1;
+}
+
+legend {
+    font-weight: 700;
+    padding: 0;
+    font-size: 1.1em;
+}
+
+.my-tickets textarea {
+    width: 100%
+}
+
+.my-tickets input {
+    max-width: 100%;
+}
+
+.jcd-wide {
+    width: 75%;
+}
+
+.jcd-narrow {
+    width: 20%;
+}
+
+.mt-tabs .tabs {
+    margin: 0 !important;
+    padding: 0 4px;
+    position: relative;
+    top: 1px;
+}
+
+.mt-tabs .tabs li {
+    display: inline;
+    margin: 0 auto;
+    line-height: 1;
+}
+
+.mt-tabs .tabs a {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px 4px 0 0;
+    border: 1px solid #ccc;
+    background: #f3f3f3;
+}
+
+.mt-tabs .tabs a.active {
+    border-bottom: 1px solid #fefefe;
+    background: #fefefe;
+}
+
+.mt-tabs .wptab {
+    background: #fff;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+}
+
+.my-tickets .checkboxes {
+    margin: 0;
+}
+
+.my-tickets .checkboxes li {
+    display: inline-block;
+    padding: 5px;
+    background: rgba(0, 0, 0, .05);
+    margin: 2px;
+}
+
+.my-tickets .checkboxes li:hover {
+    background: #fff;
+}
+
+.inside span.current {
+    padding: 2px;
+    background: #f3f3f3;
+}
+
+.inside .mt-logo {
+    width: 50%;
+    display: block;
+    margin: 0 auto 1em;
+}
+
+.mt-report-selector > div {
+    max-width: 48%;
+}
+
+.mt-report-selector:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+
+.report-by-date {
+    float: left;
+}
+
+.report-by-event {
+    float: right;
+}
+
+#mt_subject, #mt_email {
+    width: 100%;
+}
+
+.my-tickets dt {
+    font-weight: 700;
+}
+
+.mt-help li {
+    list-style-type: disc;
+    margin-left: 2em;
+}
+
+@media (max-width: 782px) {
+    .jcd-narrow {
+        width: 100%;
+    }
+
+    .jcd-wide {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .mt-report-selector > div {
+        max-width: 100%;
+        float: none;
+        margin: 1em 0;
+    }
+}
