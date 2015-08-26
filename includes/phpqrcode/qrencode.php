@@ -266,7 +266,6 @@ class QRcode {
 
 	//----------------------------------------------------------------------
 	public function encodeString( $string, $version, $level, $hint, $casesensitive ) {
-
 		if ( $hint != QR_MODE_8 && $hint != QR_MODE_KANJI ) {
 			throw new Exception( 'bad hint' );
 
