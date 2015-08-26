@@ -5,7 +5,7 @@ Tags: events, ticket sales, tickets, ticketing, registration, reservations, even
 Requires at least: 4.0
 Tested up to: 4.3.0
 License: GPLv2 or later
-Stable tag: 1.2.4
+Stable tag: 1.2.5
 
 My Tickets is an easy-to-use, flexible platform for selling event tickets with WordPress.
 
@@ -224,4 +224,4 @@ Yes. My Tickets won't sell an unlimited number of tickets for an event; in order
 
 == Upgrade Notice ==
 
-1.2.0: Important PayPal bug fix; several new features.
+1.2.5: Minor bug fix to QR code generation
