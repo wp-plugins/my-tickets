@@ -186,7 +186,7 @@ function mt_registration_fields( $form, $has_data, $data, $public = 'admin' ) {
 		$is_hidden = '';
 	}
 	if ( $registration ) {
-		$shortcode = "<textarea readonly='readonly' class='large-text readonly'>[ticket event='$event_id']</textarea>";
+		$shortcode = "<label for='shortcode'>" . __( 'Add to Cart Form Shortcode', 'my-tickets' ) . "</label><br /><textarea id='shortcode' readonly='readonly' class='large-text readonly'>[ticket event='$event_id']</textarea>";
 	} else {
 		$shortcode = '';
 	}

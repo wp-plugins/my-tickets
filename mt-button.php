@@ -544,8 +544,7 @@ function mt_save_data( $passed, $type = 'cart', $override = false ) {
 		if ( get_transient( "mt_" . $unique_id . "_" . $type ) ) {
 			delete_transient( "mt_" . $unique_id . "_" . $type );
 		}
-		set_transient( "mt_" . $unique_id . "_" . $type, $save, time() + WEEK_IN_SECONDS );
-
+		set_transient( "mt_" . $unique_id . "_" . $type, $save, current_time( 'timestamp' ) + WEEK_IN_SECONDS );
 		return true;
 	}
 }
@@ -598,7 +597,11 @@ function mt_get_data( $type, $user_ID = false ) {
 				$cookie = '[]';
 			}
 			if ( $cookie ) {
-				$data = json_decode( $cookie );
+				if ( is_array( $cookie ) ) {
+					$data = json_decode( $cookie );
+				} else {
+					$data = $cookie;
+				}
 			} else {
 				$data = false;
 			}

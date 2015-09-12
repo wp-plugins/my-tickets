@@ -101,7 +101,8 @@ class mt_auto_update {
 	 * @return string $remote_version
 	 */
 	public function getRemote_version() {
-		$request = wp_remote_post( $this->update_path, array( 'body' => array( 'action' => 'version' ) ) );
+		$request = wp_remote_post( add_query_arg( 'action', 'version', $this->update_path ), array( 'body' => array( 'action' => 'version' ) ) );
+
 		if ( ! is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) === 200 ) {
 			return $request['body'];
 		}
@@ -114,7 +115,7 @@ class mt_auto_update {
 	 * @return string $remote_package
 	 */
 	public function getRemote_package() {
-		$request = wp_remote_post( $this->update_path, array( 'body' => array( 'action' => 'package' ) ) );
+		$request = wp_remote_post( add_query_arg( 'action', 'package', $this->update_path ), array( 'body' => array( 'action' => 'package' ) ) );
 		if ( ! is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) === 200 ) {
 			return $request['body'];
 		}
@@ -127,7 +128,8 @@ class mt_auto_update {
 	 * @return bool|object
 	 */
 	public function getRemote_information() {
-		$request = wp_remote_post( $this->update_path, array( 'body' => array( 'action' => 'info' ) ) );
+		$request = wp_remote_post( add_query_arg( 'action', 'info', $this->update_path ), array( 'body' => array( 'action' => 'info' ) ) );
+		wp_mail( 'joe@joedolson.com', 'Remote Information', print_r( $request, 1 ) );
 		if ( ! is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) === 200 ) {
 			return unserialize( $request['body'] );
 		}

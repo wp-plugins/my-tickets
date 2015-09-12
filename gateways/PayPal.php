@@ -76,7 +76,7 @@ function mt_paypal_ipn() {
 			$value_match = mt_check_payment_amount( $price, $item_number );
 			if ( ( $receiver && ( strtolower( $receiver_email ) != $receiver ) ) || $payment_currency != $options['mt_currency'] || !$value_match ) {
 				wp_mail( $options['mt_to'], __( 'Payment Conditions Error', 'my-tickets' ), __( "PayPal receiver email did not match account or payment currency did not match payment on $item_number", 'my-tickets' ) . "\n" . print_r( $post, 1 ) . "\n" . print_r( $data, 1 ) );
-				status_header( 503 );
+				status_header( 200 ); // why 200? Because that's the only way to stop PayPal.
 				die;
 			}
 			mt_handle_payment( $response, $response_code, $data, $_POST );
@@ -157,11 +157,12 @@ function mt_gateway_paypal( $form, $gateway, $args ) {
 		$use_sandbox    = $options['mt_use_sandbox'];
 		$currency       = $options['mt_currency'];
 		$merchant       = $options['mt_gateways']['paypal']['merchant_id'];
+		$purchaser      = get_the_title( $payment_id );
 		$form           = "
 		<form action='" . ( $use_sandbox != 'true' ? "https://www.paypal.com/cgi-bin/webscr" : "https://www.sandbox.paypal.com/cgi-bin/webscr" ) . "' method='POST'>
 		<input type='hidden' name='cmd' value='_xclick' />
 		<input type='hidden' name='business' value='" . esc_attr( $merchant ) . "' />
-		<input type='hidden' name='item_name' value='" . sprintf( __( '%s Order', 'my-tickets' ), get_option( 'blogname' ) ) . "' />
+		<input type='hidden' name='item_name' value='" . esc_attr( sprintf( __( '%s Order from %s', 'my-tickets' ), get_option( 'blogname' ), $purchaser ) ) . "' />
 		<input type='hidden' name='item_number' value='" . esc_attr( $payment_id ) . "' />
 		<input type='hidden' name='amount' value='" . esc_attr( $total ) . "' />
 		<input type='hidden' name='no_shipping' value='" . esc_attr( $shipping ) . "' />

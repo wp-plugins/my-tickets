@@ -24,7 +24,7 @@ function mt_help() {
 							</p>
 							<h4><?php _e( 'Basic Settings', 'my-tickets' ); ?></h4>
 							<ul>
-								<li><?php _e( 'Define what post types My Tickets should be activated on','my-tickets' ); ?></li>
+								<li><?php _e( 'Define what post types My Tickets should be activated on','my-tickets' ); ?> (<?php __( 'If My Calendar is installed, activate the "Registration" panel in the My Calendar input settings', 'my-tickets' ); ?></li>
 								<li><?php _e( 'Set up a new post and click "Sell Tickets on this post"', 'my-tickets' ); ?></li>
 							</ul>
 							<h4><?php _e( 'Payment Settings', 'my-tickets' ); ?></h4>
@@ -83,6 +83,9 @@ function mt_help() {
 								<dd><?php _e( 'Whether it matters which group a ticket is purchased in. If you\'re selling tickets based on the purchaser (Adult, Child, etc.), it doesn\'t matter which group it\'s in. You have 250 tickets, and it\'s perfectly plausible for all 250 to be in one category. This is "continuous" counting. You have a specific total number of tickets, and whichever type of ticket is sold, the number is subtracted from the total number of tickets. With "discrete" sections (Gallery, Balcony, etc.), it <strong>does</strong> matter which group a ticket is sold from. You have only 50 tickets in Section A, but 100 in Section B. If you were to sell 100 tickets for Section A, you\'d have a serious problems!', 'my-tickets' ); ?></dd>
 								<dt><?php _e( 'What\'s the difference between Types of Sales?', 'my-tickets' ); ?></dt>
 								<dd><?php _e( 'When you choose "Ticket Sales", the language on buttons and in your cart will reflect that this is a ticket sale. It will also add the ability to change the number of tickets you purchase in any given category.', 'my-tickets' ); ?></dd>
+								<dt><?php _e( 'What is an "event" in My Tickets?', 'my-tickets' ); ?></dt>
+								<dd><?php _e( 'Any post, Page, or custom post type can be an "Event" for My Tickets. When you create a post or Page, you can decide to sell tickets on it; at which point it becomes an "event". If you\'re using My Calendar, creating an event also creates a post, in a hidden custom post type. Your tickets are associated with that post.', 'my-tickets' ); ?></dd>
+
 								<dt><?php _e( 'How are e-tickets and printable tickets different?', 'my-tickets' ); ?></dt>
 								<dd><?php _e( 'The main difference between e-tickets and printable tickets is in format. E-tickets are formatted for optimum fit on a mobile device, but printable tickets are shaped more like traditional tickets. These are defaults, however, since both types of tickets are fully templatable.', 'my-tickets' ); ?></dd>
 								<dt><?php _e( 'How do e-tickets and printable tickets work?', 'my-tickets' ); ?></dt>

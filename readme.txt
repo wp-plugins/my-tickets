@@ -67,6 +67,15 @@ Dutch, Norwegian (Bokmal)
 * Add 'Waiting List' as payment status (admin-only by default)
 * Add option to use radio buttons instead of checkboxes
 
+= 1.2.6 =
+
+* Fixes to automatic updating class for premium plugin license holders
+* Add label to shortcode textarea for context.
+* Expand FAQ built into plug-in.
+* Pass provided purchaser name into PayPal item information.
+* Return 200 header on PayPal data mismatch so notification email is only sent once.
+* Bug fix: Custom fields API did not pass data if saved data was a string and user was not logged in.
+
 = 1.2.5 =
 
 * Bug fix: Switch esc_url to esc_url_raw on QR Code URL so parameters will be followable. [Broken in 1.2.2]

@@ -142,7 +142,7 @@ function mt_payment_settings() {
 				</li>";
 										$settings = $fields['fields'];
 										foreach ( $settings as $key => $label ) {
-											$pg_settings .= "<li><label for='mt_$gateway-$key'>$label</label><br /> <input type='text' name='mt_gateways[$gateway][$key]' id='mt_$gateway-$key' size='60' value='" . esc_attr( $options['mt_gateways'][ $gateway ][ $key ] ) . "' /></li>";
+											$pg_settings .= "<li><label for='mt_$gateway-$key'>$label</label><br /> <input type='text' name='$mt_gateways[$gateway][$key]' id='mt_$gateway-$key' size='60' value='" . esc_attr( $options['mt_gateways'][ $gateway ][ $key ] ) . "' /></li>";
 										}
 										$pg_tabs .= "<li><a href='#$gateway'>" . sprintf( __( '%s settings', 'my-tickets' ), $fields['label'] ) . "</a></li>";
 										$payment_gateways .= "
