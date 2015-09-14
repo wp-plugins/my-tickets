@@ -15,7 +15,7 @@ My Tickets integrates with <a href="http://wordpress.org/plugins/my-calendar/">M
 
 The default My Tickets plug-in integrates with PayPal Standard payments, so you can sell tickets immediately. You can also take offline payments, to use My Tickets as a reservation platform.
 
-More premium add-ons are being developed, but you can purchase the <a href="https://www.joedolson.com/my-tickets/add-ons/">Authorize.net payment gateway</a> plug-in today!
+Explore the premium add-ons for My Tickets! <a href="https://www.joedolson.com/my-tickets/add-ons/">Buy the Authorize.net payment gateway, Donations add-on and more</a>!
 
 = Basic Features: =
 
@@ -40,7 +40,7 @@ Check out the <a href="http://docs.joedolson.com/my-tickets/">online documentati
 
 = Translations =
 
-Dutch, Norwegian (Bokmal)
+Norwegian (Bokmal), Dutch, Polish, German (Switzerland), French, German
 
 == Installation ==
 
@@ -71,10 +71,11 @@ Dutch, Norwegian (Bokmal)
 
 * Fixes to automatic updating class for premium plugin license holders
 * Add label to shortcode textarea for context.
-* Expand FAQ built into plug-in.
+* Expand FAQ.
 * Pass provided purchaser name into PayPal item information.
 * Return 200 header on PayPal data mismatch so notification email is only sent once.
 * Bug fix: Custom fields API did not pass data if saved data was a string and user was not logged in.
+* Misplaced sprintf argument in ticket closure notice.
 
 = 1.2.5 =
 

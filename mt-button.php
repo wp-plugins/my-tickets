@@ -332,7 +332,11 @@ function mt_sales_close( $event_id, $expires ) {
 			$expiration = $expires * 60 * 60;
 			$begin      = strtotime( $event['event_begin'] . ' ' . $event['event_time'] ) - $expiration;
 			if ( date( 'Y-m-d', $begin ) == date( 'Y-m-d', current_time( 'timestamp' ) ) ) {
-				return "<p>" . sprintf( apply_filters( 'mt_ticket_sales_close_text', __( 'Ticket sales close at %s today', 'my-tickets' ), "<strong>" . date_i18n( get_option( 'time_format' ), $begin ) . "</strong>" ) ) . "</p>";
+				return "<p>" . sprintf(
+					apply_filters( 'mt_ticket_sales_close_text',
+						__( 'Ticket sales close at %s today', 'my-tickets' ), $event
+					), "<strong>" . date_i18n( get_option( 'time_format' ), $begin ) . "</strong>"
+				) . "</p>";
 			}
 		}
 	}
