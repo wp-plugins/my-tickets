@@ -67,6 +67,10 @@ Norwegian (Bokmal), Dutch, Polish, German (Switzerland), French, German
 * Add 'Waiting List' as payment status (admin-only by default)
 * Add option to use radio buttons instead of checkboxes
 
+= 1.2.7 =
+
+* Bug fix: Something broken on Payment settings page. No idea what it was...
+
 = 1.2.6 =
 
 * Fixes to automatic updating class for premium plugin license holders
