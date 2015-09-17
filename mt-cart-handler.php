@@ -48,7 +48,7 @@ function mt_delete_data( $data = 'cart' ) {
 	if ( is_user_logged_in() ) {
 		global $current_user;
 		get_currentuserinfo();
-		update_user_meta( $current_user->ID, "_mt_user_$data", '' );
+		delete_user_meta( $current_user->ID, "_mt_user_$data" );
 	} else {
 		if ( $unique_id ) {
 			delete_transient( "mt_" . $unique_id . "_" . $data );
