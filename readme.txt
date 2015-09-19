@@ -3,7 +3,7 @@ Contributors: joedolson
 Donate link: http://www.joedolson.com/donate/
 Tags: events, ticket sales, tickets, ticketing, registration, reservations, event tickets, sell tickets, event registration, box office
 Requires at least: 4.0
-Tested up to: 4.3.0
+Tested up to: 4.3.1
 License: GPLv2 or later
 Stable tag: 1.2.7
 
