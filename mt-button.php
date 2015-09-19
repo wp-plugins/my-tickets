@@ -64,6 +64,13 @@ function mt_has_tickets( $pricing ) {
  * @return string
  */
 function mt_registration_form( $content, $event = false, $view = 'calendar', $time = 'month', $override = false ) {
+	$options      = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
+	$purchase_page = $options['mt_purchase_page'];
+	$receipt_page = $options['mt_purchase_page'];
+	$tickets_page = $options['mt_tickets_page'];
+	if ( is_page( $purchase_page ) || is_page( $receipt_page ) || is_page( $tickets_page ) ) {
+		return $content;
+	}
 	if ( !$event ) {
 		return $content;
 	}
@@ -72,7 +79,6 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 	if ( get_post_meta( $event_id, '_mt_hide_registration_form', true ) == 'true' && $override == false ) {
 		return $content;
 	}
-	$options      = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
 	$registration = get_post_meta( $event_id, '_mt_registration_options', true );
 	// if no 'total' is set at all, this is not an event with tickets.
 	if ( empty( $registration['prices'] ) ) {

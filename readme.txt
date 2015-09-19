@@ -70,7 +70,9 @@ Norwegian (Bokmal), Dutch, Polish, German (Switzerland), French, German
 = 1.2.8 =
 
 * Bug fix: debugging query left in place in autoupdates class
-*
+* Bug fix: more reliable deletion of user data
+* Bug fix: Not possible to disable ticket sales if created unintentionally
+* Bug fix: No longer possible to sell tickets for My Tickets cart pages
 
 = 1.2.7 =
 
