@@ -10,7 +10,7 @@ jQuery(document).ready(function ($) {
         $('#event' + num).after(newElem);
         // enable the "remove" button
         $('#del_field').removeAttr('disabled');
-        // business rule: you can only add 10 occurrences
+        // business rule: you can only add 20 duplications
         if (newNum == 20)
             $('#add_field').attr('disabled', 'disabled');
     });
@@ -38,8 +38,8 @@ jQuery(document).ready(function ($) {
         $('#price' + num).after(newElem);
         // enable the "remove" button
         $('#del_price').removeAttr('disabled');
-        // business rule: you can only add 6 variations
-        if (newNum == 6)
+        // business rule: you can only add 20 variations
+        if (newNum == 20)
             $('#add_price').attr('disabled', 'disabled');
     });
 

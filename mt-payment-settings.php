@@ -144,6 +144,7 @@ function mt_payment_settings() {
 										foreach ( $settings as $key => $label ) {
 											$pg_settings .= "<li><label for='mt_$gateway-$key'>$label</label><br /> <input type='text' name='mt_gateways[$gateway][$key]' id='mt_$gateway-$key' size='60' value='" . esc_attr( $options['mt_gateways'][ $gateway ][ $key ] ) . "' /></li>";
 										}
+										$notes    = ( isset( $fields['note'] ) ) ? "<p>" . esc_html( $fields['note'] ) . "</p>" : '';
 										$pg_tabs .= "<li><a href='#$gateway'>" . sprintf( __( '%s settings', 'my-tickets' ), $fields['label'] ) . "</a></li>";
 										$payment_gateways .= "
 					<div class='wptab mt_$gateway' id='$gateway' aria-live='assertive'>
@@ -151,6 +152,7 @@ function mt_payment_settings() {
 						<legend>$fields[label]</legend>
 						<p><input type='radio' name='mt_default_gateway' id='mt_default_gateway_$gateway' value='$gateway'" . mt_is_checked( 'mt_default_gateway', $gateway, $options, true ) . " /> <label for='mt_default_gateway_$gateway'>" . __( 'Default gateway', 'my-tickets' ) . "</label></p>
 							$pg_settings
+							$notes
 					</fieldset>
 					</div>";
 									}

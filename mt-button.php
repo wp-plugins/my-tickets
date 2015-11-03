@@ -201,6 +201,7 @@ function mt_registration_form( $content, $event = false, $view = 'calendar', $ti
 				$closing_time = mt_sales_close( $event_id, $registration['reg_expires'] );
 				$no_post      = ( $no_postal && in_array( 'postal', array_keys( $options['mt_ticketing'] ) ) ) ? "<p class='mt-no-post'>" . apply_filters( 'mt_cannot_send_by_email_text', __( 'Tickets for this event cannot be sent by mail.', 'my-tickets' ) ) . "</p>" : '';
 				$legend       = ( $registration['sales_type'] == 'registration' ) ? __( 'Register', 'my-tickets' ) : __( 'Buy Tickets', 'my-tickets' );
+				$legend       = apply_filters( 'mt_button_legend_text', $legend, $registration );
 				$disabled     = ( $total_order > $tickets_remaining ) ? " disabled='disabled'" : '';
 				$output       = "
 			<div class='mt-response' id='mt-response-$event_id' aria-live='assertive'></div>

@@ -67,11 +67,11 @@
 							<?php mt_logo(); ?>
 						<?php } ?>
 					</div>
-					<div class='ticket_id'>
-						<?php mt_ticket_id(); ?>
-					</div>
-					<?php echo apply_filters( 'mt_custom_ticket', '', mt_receipt_id() ); ?>
 				<?php } ?>
+				<div class='ticket_id'>
+					<?php mt_ticket_id(); ?>
+				</div>
+				<?php echo apply_filters( 'mt_custom_ticket', '', mt_receipt_id(), mt_get_ticket_method() ); ?>
 			</div>
 		<?php
 		endwhile;

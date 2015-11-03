@@ -139,7 +139,8 @@ function mt_setup_paypal( $gateways ) {
 		'fields' => array(
 			'email'       => __( "PayPal email (primary)", 'my-tickets' ),
 			'merchant_id' => __( 'PayPal Merchant ID', 'my-tickets' )
-		)
+		),
+		'note'  => __( 'You need to verify that IPN is enabled in your PayPal account for payments to be handled.', 'my-tickets' )
 	);
 
 	return $gateways;

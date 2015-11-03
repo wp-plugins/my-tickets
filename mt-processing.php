@@ -122,8 +122,10 @@ function mt_get_prices( $event_id ) {
 		// logged-in users ordering from the front-end, only; in admin, no discount applied.
 		if ( is_user_logged_in() && ! is_admin() && is_array( $prices ) ) { // cycle only if pricing is being modified
 			foreach ( $prices as $label => $options ) {
-				$price                     = $prices[ $label ]['price'];
-				$prices[ $label ]['price'] = mt_calculate_discount( $price );
+				if ( $label != 'sold' ) {
+					$price                     = $prices[ $label ]['price'];
+					$prices[ $label ]['price'] = mt_calculate_discount( $price );
+				}
 			}
 		}
 

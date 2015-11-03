@@ -153,6 +153,13 @@ function mt_create_payment( $post ) {
 function mt_create_tickets( $purchase_id, $purchased = false ) {
 	$purchased = ( $purchased ) ? $purchased : get_post_meta( $purchase_id, '_purchase_data', true );
 	foreach ( $purchased as $event_id => $purchase ) {
+		$_purchased = get_post_meta( $purchase_id, '_purchased', true );
+		$_purchase = get_post_meta( $event_id, '_purchase', true );
+		$_receipt = get_post_meta( $event_id, '_receipt', true );
+		if ( $_purchased && $_purchase && $_receipt ) {
+			// these tickets have already been generated
+			return;
+		}
 		$registration = get_post_meta( $event_id, '_mt_registration_options', true );
 		add_post_meta( $purchase_id, '_purchased', array( $event_id => $purchase ) );
 		add_post_meta( $event_id, '_purchase', array( $purchase_id => $purchase ) );
@@ -209,7 +216,7 @@ function mt_calculate_cart_cost( $purchased ) {
 	$total = 0;
 	if ( $purchased ) {
 		foreach ( $purchased as $event_id => $tickets ) {
-			$prices = mt_get_prices( $event_id );
+								$prices = mt_get_prices( $event_id );
 			if ( $prices ) {
 				foreach ( $tickets as $type => $ticket ) {
 					if ( (int) $ticket['count'] > 0 ) {

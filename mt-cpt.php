@@ -498,6 +498,8 @@ function mt_post_meta( $id ) {
 		if ( isset( $_POST['mt_cart_order'] ) ) {
 			$purchased = $_POST['mt_cart_order'];
 			mt_create_tickets( $id, $purchased );
+			// handle custom fields in custom orders
+			do_action( 'mt_save_payment_fields', $id, $_POST, $purchased );
 			$receipt_id = md5( get_permalink( $id ) );
 			update_post_meta( $id, '_receipt', $receipt_id );
 		}

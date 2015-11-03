@@ -231,11 +231,7 @@ function mt_send_notifications( $status = 'Completed', $details = array(), $erro
 
 	// restructure post meta array to match cart array
 	if ( $status == 'Completed' || ( $status == 'Pending' && $gateway == 'offline' ) ) {
-		if ( isset( $_POST['_send_email'] ) && $_POST['_send_email'] == 'true' ) {
-			// don't create tickets.
-		} else {
-			mt_create_tickets( $id );
-		}
+		mt_create_tickets( $id );
 	}
 	$purchased    = get_post_meta( $id, '_purchased' );
 	$purchase_data = get_post_meta( $id, '_purchase_data', true );

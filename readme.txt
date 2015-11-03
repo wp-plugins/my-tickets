@@ -66,6 +66,15 @@ Norwegian (Bokmal), Dutch, Polish, German (Switzerland), French, German
 * Add 'Reservation' as payment status (admin-only by default)
 * Add 'Waiting List' as payment status (admin-only by default)
 * Add option to use radio buttons instead of checkboxes
+* Add option to use external link to add event tickets to cart.
+
+= 1.2.9 =
+
+* New filter: 'mt_button_legend_text' to edit 'Buy Tickets' legend
+* Add note to mention need to enable IPN on PayPal
+* Bug fix: Don't create additional copies of tickets when admin saves edits to Payment
+* Bug fix: display ticket ID on both print & e-tickets
+* Bug fix: custom fields not saved in admin creation of payment
 
 = 1.2.8 =
 

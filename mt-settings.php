@@ -63,7 +63,6 @@ function mt_settings() {
 
 	?>
 	<div class="wrap my-tickets" id="mt_settings">
-		<div id="icon-options-general" class="icon32"><br/></div>
 		<h2><?php _e( 'Event Registrations', 'my-tickets' ); ?></h2>
 		<?php echo $response; ?>
 		<div class="postbox-container jcd-wide">
