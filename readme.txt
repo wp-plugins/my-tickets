@@ -34,7 +34,7 @@ For the seller:
 * Define either continuous (Adult, Student, Child) or discrete (Section 1, Section 2, Section 3) ticket classes for any event
 * Offer member-only discounts for your registered members
 
-My Tickets is hugely flexible, and a library of add-ons to add new gateways and features is in development!
+My Tickets is hugely flexible, and a <a href="https://www.joedolson.com/my-tickets/add-ons/">library of add-ons</a> to add new gateways and features is in development!
 
 Check out the <a href="http://docs.joedolson.com/my-tickets/">online documentation</a>.
 
