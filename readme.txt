@@ -5,7 +5,7 @@ Tags: events, ticket sales, tickets, ticketing, registration, reservations, even
 Requires at least: 4.0
 Tested up to: 4.3.1
 License: GPLv2 or later
-Stable tag: 1.2.8
+Stable tag: 1.2.9
 
 My Tickets is an easy-to-use, flexible platform for selling event tickets with WordPress.
 
