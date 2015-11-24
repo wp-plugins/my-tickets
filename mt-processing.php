@@ -123,7 +123,10 @@ function mt_get_prices( $event_id ) {
 		if ( is_user_logged_in() && ! is_admin() && is_array( $prices ) ) { // cycle only if pricing is being modified
 			foreach ( $prices as $label => $options ) {
 				if ( $label != 'sold' ) {
-					$price                     = $prices[ $label ]['price'];
+					$price                     = isset( $prices[ $label ]['price'] ) ? $prices[ $label ]['price'] : false;
+					if ( !$price ) {
+						continue;
+					}
 					$prices[ $label ]['price'] = mt_calculate_discount( $price );
 				}
 			}

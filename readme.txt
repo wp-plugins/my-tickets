@@ -68,6 +68,10 @@ Norwegian (Bokmal), Dutch, Polish, German (Switzerland), French, German
 * Add option to use radio buttons instead of checkboxes
 * Add option to use external link to add event tickets to cart.
 
+= 1.2.10 =
+
+* Bug fix: not saving correctly when multiple events sold in one cart order
+
 = 1.2.9 =
 
 * New filter: 'mt_button_legend_text' to edit 'Buy Tickets' legend

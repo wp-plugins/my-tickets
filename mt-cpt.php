@@ -225,8 +225,8 @@ function mt_add_uneditable() {
 		}
 
 		$receipt       = get_post_meta( $post_id, '_receipt', true );
-		$options  = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
-		$link    = add_query_arg( 'receipt_id', $receipt, get_permalink( $options['mt_receipt_page'] ) );
+		$options       = array_merge( mt_default_settings(), get_option( 'mt_settings' ) );
+		$link          = add_query_arg( 'receipt_id', $receipt, get_permalink( $options['mt_receipt_page'] ) );
 		$purchase      = get_post_meta( $post_id, '_purchased' );
 		$discount      = get_post_meta( $post_id, '_discount', true );
 		$discount_text = ( $discount != '' ) ? sprintf( __( " @ %d&#37; member discount", 'my-tickets' ), $discount ) : '';
